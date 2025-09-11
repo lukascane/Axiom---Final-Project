@@ -1,14 +1,3 @@
-# Axiom - AI Fact-Checker
-axiom-app/
-├── venv/
-├── app.py          # Main Flask application file
-├── models.py       # Where  database tables (models) will live
-├── templates/      # HTML files later
-└── README.md
-
-
-
-
 Axiom Project: Status Update & Checklist
 This document tracks the completion of the core tasks for the Axiom project's initial setup and backend development.
 
@@ -61,3 +50,14 @@ A secure login system is non-negotiable. I had to make sure users could sign up,
 Task: Implement the login/sign up flow.
 
 Status: ✅ Done! My signup, login, and logout routes are fully functional and secure, using password hashing and session management.
+
+Project File Structure
+Here is the clean and organized structure for my project files. This helps me keep track of everything.
+
+📁 axiom-app/
+│
+├── 🐍 app.py          # Main Flask application file
+├── 📦 models.py       # Where database tables (models) will live
+├── 📄 templates/      # For my HTML files
+├── 📝 README.md
+└── ⚙️ venv/            # My Python virtual environment
