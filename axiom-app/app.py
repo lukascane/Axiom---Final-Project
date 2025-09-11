@@ -1,93 +1,95 @@
 # --- IMPORTS ---
-# Okay, so here I'm importing all the tools I need.
-# Flask is for the server, render_template for HTML pages.
-# request and jsonify are for handling API data.
+# I need these tools to make my web app work.
 from flask import Flask, request, jsonify, render_template
 
-# I'm importing my database models from models.py. This is crucial.
+# These are my database models from the other file.
 from models import db, User, FactCheck, Source
 
-# These are for security: hashing passwords and managing logins.
+# Werkzeug is a tool that helps with password security.
 from werkzeug.security import generate_password_hash, check_password_hash
+
+# Flask-Login will manage the user's session.
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 
 
 # --- APP SETUP ---
-# This is where I create my actual Flask web app.
+# This line creates my web application.
 app = Flask(__name__)
 
-# I need to set a secret key. This is for securing user sessions.
-app.config['SECRET_key'] = 'a-super-secret-key-that-no-one-will-guess' # I should change this later.
+# --- CONFIGURATION ---
+# THIS IS THE LINE I NEED TO ADD.
+# The secret key is essential for creating secure user sessions.
+# I need to set this to a long, random, and secret string.
+app.config['SECRET_KEY'] = 'a-super-secret-key-that-no-one-will-guess'
 
-# --- DATABASE CONFIGURATION ---
-# Here, I'm telling Flask where my database file is.
+# I'm telling my app where to find the database. It'll be a file called 'axiom.db'.
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///axiom.db'
-# I'll turn this off to keep the console clean.
+# This is just to turn off a feature I don't need, which keeps my console clean.
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-# This line officially connects my database to the app.
+# This connects my database to my Flask app.
 db.init_app(app)
 
 
 # --- USER AUTHENTICATION SETUP ---
-# Now I'm setting up the login manager.
+# This sets up the login manager.
 login_manager = LoginManager()
 login_manager.init_app(app)
-# If someone who isn't logged in tries to go to a protected page,
-# I'll redirect them here. Makes sense.
+# If a user tries to access a protected page but isn't logged in,
+# I'll send them to the 'login' page.
 login_manager.login_view = 'login'
 
-# Flask-Login needs this function to know how to find a specific user by their ID.
-# It uses the ID stored in the session cookie.
+# This function is required by Flask-Login. It's how it loads a user
+# from the database based on their ID, which is stored in the session cookie.
 @login_manager.user_loader
 def load_user(user_id):
-    # It just queries the User table for the matching primary key. Simple enough.
+    # It finds the user by their primary key (ID).
     return User.query.get(int(user_id))
 
 
 # --- PAGE ROUTES ---
-# This is my main homepage route.
+# This is my homepage. It will show the index.html file.
 @app.route('/')
 def home():
-    # My goal here is just to show the main index.html page.
+    # My app will look for 'index.html' inside a folder named 'templates'.
     return render_template('index.html')
 
 
 # --- AUTHENTICATION API ROUTES ---
 
-# This is my endpoint for when a new user signs up.
+# This route handles user registration.
 @app.route('/signup', methods=['POST'])
 def signup():
-    # First, I grab the email and password they sent.
     data = request.get_json()
     email = data.get('email')
     password = data.get('password')
 
-    # I must check if the email is already in use.
+    # I check if a user with this email already exists to avoid duplicates.
     if User.query.filter_by(email=email).first():
         return jsonify({"error": "Email address already registered"}), 409
 
-    # Now, I'll hash the password. I should never, ever store it as plain text.
+    # I will never store the password directly. Instead, I create a secure "hash".
     hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
 
-    # With the hashed password, I can create the new user and save them to the DB.
+    # Now I create the new user with the hashed password.
     new_user = User(email=email, password_hash=hashed_password)
     db.session.add(new_user)
     db.session.commit()
 
     return jsonify({"message": "User created successfully!"}), 201
 
-# This route is for logging in an existing user.
+
+# This route handles user login.
 @app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
     email = data.get('email')
     password = data.get('password')
 
-    # I need to find the user by their email first.
+    # I look for a user with the provided email.
     user = User.query.filter_by(email=email).first()
 
-    # My logic here is to check two things: does the user exist, AND is the password correct?
+    # I check if the user exists AND if the password they provided matches the stored hash.
     # The `check_password_hash` function handles the secure comparison for me.
     if not user or not check_password_hash(user.password_hash, password):
         return jsonify({"error": "Invalid email or password"}), 401
@@ -96,74 +98,73 @@ def login():
     login_user(user)
     return jsonify({"message": "Logged in successfully", "user_id": user.id}), 200
 
+
 # This is my logout route. It has to be protected so only logged-in users can access it.
 @app.route('/logout')
 @login_required
 def logout():
-    logout_user() # This function from Flask-Login clears the session.
+    logout_user() # This clears the user's session.
     return jsonify({"message": "Logged out successfully"}), 200
 
 
-# --- CORE FEATURE API ROUTES (CRUD) ---
+# --- CORE FEATURE API ROUTES ---
 
-# This is my API for creating a new fact-check.
+# This is the API endpoint for submitting a fact-check.
+# I removed @login_required to allow anonymous submissions.
 @app.route('/api/check', methods=['POST'])
 def create_check():
     data = request.get_json()
     claim = data.get('claim')
-    user_id_to_store = None # I'll start with None for anonymous users.
+    user_id = None # Default to None for anonymous users
 
-    # I have to make sure they actually sent a claim.
+    # I make sure the user actually sent some text to check.
     if not claim:
         return jsonify({"error": "Claim text is required"}), 400
 
-    # My logic for handling both user types: if the current user is logged in,
-    # I'll grab their ID. Otherwise, it stays None.
+    # I check if a user is logged in.
     if current_user.is_authenticated:
-        user_id_to_store = current_user.id
+        user_id = current_user.id
 
-    # Now I create the record, linking it to a user ID if one exists.
-    new_check = FactCheck(claim_text=claim, user_id=user_id_to_store)
+    # I create a new FactCheck record.
+    # This will be linked to a user_id if they're logged in, otherwise it will be null.
+    new_check = FactCheck(claim_text=claim, user_id=user_id)
 
     db.session.add(new_check)
     db.session.commit()
 
     return jsonify({"message": "Fact check submitted!", "check_id": new_check.id}), 201
 
-# This route is for getting a user's own history. (Read part of CRUD)
+# This route gets the history for the currently logged-in user.
 @app.route('/api/history', methods=['GET'])
-@login_required # A user should only be able to see their own history.
+@login_required
 def get_history():
-    # I'll find all the checks in the database that match the current user's ID.
+    # I get all checks where the user_id matches the logged-in user.
     user_checks = FactCheck.query.filter_by(user_id=current_user.id).all()
-    
-    # I need to format this data nicely into a list before sending it as JSON.
-    history_list = []
-    for check in user_checks:
-        history_list.append({
-            "id": check.id,
-            "claim": check.claim_text,
-            "verdict": check.verdict # This will be null for now, but I'll add it.
-        })
-    return jsonify(history_list), 200
+    # I need to convert the list of objects into a list of dictionaries to send as JSON.
+    history = [
+        {"id": check.id, "claim_text": check.claim_text, "verdict": check.verdict, "user_id": check.user_id}
+        for check in user_checks
+    ]
+    return jsonify(history), 200
 
-# This route is for deleting a fact-check. (Delete part of CRUD)
+
+# This route allows a user to delete one of their own fact-checks.
 @app.route('/api/check/<int:check_id>', methods=['DELETE'])
-@login_required # Must be logged in to delete.
+@login_required
 def delete_check(check_id):
-    # I'll find the specific check they want to delete by its ID.
+    # I find the check the user wants to delete.
     check_to_delete = FactCheck.query.get(check_id)
 
-    # What if the ID doesn't exist? I need to handle that.
+    # I make sure the check actually exists.
     if not check_to_delete:
         return jsonify({"error": "Fact check not found"}), 404
 
-    # This is a critical security check. I must verify that the person deleting the check
-    # is the same person who created it.
+    # This is a critical security check. I make sure the person trying to delete the
+    # check is the same person who created it.
     if check_to_delete.user_id != current_user.id:
-        return jsonify({"error": "You are not authorized to delete this item"}), 403
+        return jsonify({"error": "You are not authorized to delete this item"}), 403 # 403 means "Forbidden"
 
-    # If they are the owner, I can proceed with the deletion.
+    # If everything is okay, I delete it from the database.
     db.session.delete(check_to_delete)
     db.session.commit()
 
@@ -171,12 +172,10 @@ def delete_check(check_id):
 
 
 # --- RUN THE APP ---
-# This `if` statement makes sure the server only runs when I execute this file directly.
+# This part of the script only runs if I execute `python app.py` directly.
 if __name__ == '__main__':
-    # I need to create the database tables from my models before running the app.
-    # The `with app.app_context()` makes sure the app is ready for this.
     with app.app_context():
+        # This creates the database tables if they don't exist yet.
         db.create_all()
-    # Okay, time to run the server. Debug mode is on so it reloads automatically.
+    # This starts my web server.
     app.run(debug=True)
-
