@@ -1,12 +1,25 @@
 import time
 import random
 import os
+import sys
 from openai import OpenAI
 from dotenv import load_dotenv
 
 # This loads your API key from the .env file
 load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
+
+# This is a new check to make sure the API key was actually found.
+# If it's not found, the program will stop and print a helpful message.
+if not api_key:
+    print("---")
+    print("ERROR: Your OPENAI_API_KEY was not found.")
+    print("Please make sure you have a file named '.env' in the 'axiom-app' directory,")
+    print("and make sure it contains the line: OPENAI_API_KEY='sk-yourkey'")
+    print("---")
+    sys.exit(1)
+
+
 client = OpenAI(api_key=api_key)
 
 def get_ai_chat_response(messages: list):
