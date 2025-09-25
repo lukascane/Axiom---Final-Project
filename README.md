@@ -1,4 +1,5 @@
 25.09.2025:
+
 Step 1: Evolving the Database for Conversations
 My first action was to completely redesign the database structure to properly support multi-turn conversations.
 
@@ -40,6 +41,21 @@ After implementing these significant changes, I performed a full suite of tests 
 
 Action Taken:
 I conducted a clean-slate test by deleting the old database, restarting the server to generate the new schema, and using curl to simulate a complete user journey.
+
+This update will address your primary goal and your chosen token-management strategy.
+
+Key Features Implemented:
+
+New API Endpoints: /api/chat/start, /api/chat/<thread_id>/message, and /api/chat/<thread_id>.
+
+Full History Context: The entire chat history is fetched and prepared for the AI on every new message.
+
+Token/Cost Management:
+
+Conversations are limited to 5 user questions (10 total messages).
+
+The length of a user's submitted message is limited to 1000 characters.
+
 
 Rationale:
 

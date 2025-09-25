@@ -17,7 +17,7 @@ def get_ai_chat_response(messages: list):
 
     try:
         # This is the actual call to the OpenAI API.
-        response = client.chat.completions.create(engoe
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=messages,
             max_tokens=200,
@@ -31,3 +31,4 @@ def get_ai_chat_response(messages: list):
         # If anything goes wrong, we return a clear error message.
         print(f"[ERROR] OpenAI API call failed: {e}")
         return "Sorry, I encountered an error while processing your request."
+
