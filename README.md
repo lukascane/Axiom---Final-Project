@@ -1,3 +1,54 @@
+25.09.2025:
+Step 1: Evolving the Database for Conversations
+My first action was to completely redesign the database structure to properly support multi-turn conversations.
+
+Action Taken:
+I replaced my old Fact model with two new, interconnected models: ChatThread and ChatMessage.
+
+Rationale:
+
+Why the change? My original single-table design was insufficient because a conversation is more than one request and response; it's a collection of linked messages. Storing each message as an independent "fact" would make it impossible to retrieve a coherent conversation history.
+
+Why a ChatThread table? This table acts as a container. Each time a user starts a new conversation, a new thread is created and linked to their user_id. This was a core requirement and allows me to group all related messages logically.
+
+Why a ChatMessage table? This table stores every individual message from both the user and the assistant. Crucially, each message has a thread_id, which links it back to its parent conversation. This structure makes it simple and efficient to query the database for the complete history of any given chat.
+
+Step 2: Rebuilding the Backend for a Conversational Flow
+With the new database structure in place, I rewrote the core application logic in app.py to handle the lifecycle of a chat.
+
+Action Taken:
+I implemented three new API endpoints and integrated a token management strategy directly into the application logic.
+
+Rationale:
+
+Why new API endpoints? The user's interaction with a chatbot is a sequence of events. I designed the API to mirror this logical flow:
+
+POST /api/chat/start: A user must first create a conversation thread before they can send messages.
+
+POST /api/chat/<thread_id>/message: All subsequent messages are sent to this endpoint, ensuring they are saved to the correct conversation.
+
+GET /api/chat/<thread_id>: This allows the user (and the application) to retrieve the full history of a specific conversation.
+
+Why I Chose My Token Management Strategy: Preserving history is expensive, as the context sent to the AI grows with every message. I decided that for the MVP, the best balance between user experience and cost control was to limit the number of messages per thread (to 5 user questions).
+
+This approach guarantees the highest possible quality of AI responses because the model always receives the full, untruncated context of the conversation.
+
+It also creates a predictable upper limit on token costs for any single conversation, which is a critical consideration for a real-world application. I also added a character limit on user input as another simple safeguard against excessive token usage.
+
+Step 3: Ensuring Reliability Through Rigorous Testing
+After implementing these significant changes, I performed a full suite of tests to verify that every part of the new system works as intended.
+
+Action Taken:
+I conducted a clean-slate test by deleting the old database, restarting the server to generate the new schema, and using curl to simulate a complete user journey.
+
+Rationale:
+
+Why delete the database? My changes to models.py were a "breaking change." The new application code would not be able to read the old database structure, so starting fresh was essential to prevent errors and ensure the new ChatThread and ChatMessage tables were created correctly.
+
+Why use curl? Without a frontend interface, curl allows me to act as the browser and directly test each API endpoint in the correct sequence. My test plan confirmed that a user can successfully sign up, log in, start a thread, exchange several messages with the AI (with the server correctly remembering the context), and retrieve the conversation history. This proves that the entire backend system is fully functional.
+
+
+
 23.09.2025:
 
 
