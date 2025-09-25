@@ -7,6 +7,9 @@ Building Chat Functionality
 
 I'm now integrating the chatbot API endpoints into app.py, which is going to replace the previous fact-checking mechanisms. I've designed routes for starting new chats, sending messages, and retrieving the conversation history. In addition, I will create a guide for testing the new chatbot features using curl commands. This will ensure each part of the implementation functions as expected.# 🧠 Axiom: AI-Powered Fact-Checking Platform
 
+Building Chat Functionality
+
+I'm now integrating the chatbot API endpoints into app.py, which is going to replace the previous fact-checking mechanisms. I've designed routes for starting new chats, sending messages, and retrieving the conversation history. In addition, I will create a guide for testing the new chatbot features using curl commands. This will ensure each part of the implementation functions as expected.\
 
 previosly:
 
