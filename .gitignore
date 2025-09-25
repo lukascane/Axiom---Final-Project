@@ -1,0 +1,12 @@
+# Environment variables - KEEP YOUR SECRETS SAFE!
+.env
+
+# Python virtual environment - No need to upload libraries.
+venv/
+.venv/
+
+# Database files - Don't upload the database itself.
+*.db
+
+# Python cache - Ignore temporary Python files.
+__pycache__/
