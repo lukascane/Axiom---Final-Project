@@ -1,4 +1,14 @@
-# 🧠 Axiom: AI-Powered Fact-Checking Platform
+23.09.2025:
+
+
+I'm currently focused on the models.py file, adding the ChatThread and ChatMessage tables. These will serve as the foundation for storing and managing conversation histories, a crucial step in the process. My next step will be to create a new engine.py file to handle more of the application logic.
+
+Building Chat Functionality
+
+I'm now integrating the chatbot API endpoints into app.py, which is going to replace the previous fact-checking mechanisms. I've designed routes for starting new chats, sending messages, and retrieving the conversation history. In addition, I will create a guide for testing the new chatbot features using curl commands. This will ensure each part of the implementation functions as expected.# 🧠 Axiom: AI-Powered Fact-Checking Platform
+
+
+previosly:
 
 [![Python](https://img.shields.io/badge/python-3.8%2B-blue.svg)](https://www.python.org/downloads/release/python-380/)
 [![Flask](https://img.shields.io/badge/flask-2.0+-lightgrey.svg)](https://flask.palletsprojects.com/)
