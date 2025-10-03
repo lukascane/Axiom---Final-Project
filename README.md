@@ -1,3 +1,11 @@
+2.10.2025 
+High-Level Functionalities
+we will build the complete backend logic and all the necessary frontend pages to bring your diagram to life.
+Explanation: This is a major update. We will completely replace your app.py with a new version that includes all the routes to serve the HTML pages (/home, /history, /chat) and the API endpoints that provide data for them. We will also create two brand-new HTML files (home.html, history.html) and significantly upgrade your chat.html to be fully interactive.
+
+Technical Design - Database Schema
+My diagram correctly identifies that the Threads table needs an is_public field to manage visibility. Your current models.py on GitHub is missing this.
+
 25.09.2025:
 
 Step 1: Evolving the Database for Conversations
