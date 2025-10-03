@@ -59,7 +59,7 @@ def view_chat_thread(thread_id):
         return "This chat is private and you are not authorized to view it.", 403
         
     # I'll tell the template if the current user is the owner.
-    # This allows me to show/hide buttons like "delete" or the message input box.
+    # This allows me to show/hide buttons or the message input box.
     is_owner = current_user.is_authenticated and current_user.id == thread.user_id
     return render_template('chat.html', thread_id=thread.id, is_owner=is_owner)
 
@@ -232,3 +232,4 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     app.run(debug=True, port=5001)
+

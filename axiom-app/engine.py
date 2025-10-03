@@ -25,6 +25,16 @@ def get_ai_chat_response(messages: list):
     This function takes a list of messages (the conversation history)
     and gets a response from the OpenAI API.
     """
+    # --- NEW SIMULATION LOGIC ---
+    # I'm checking if the last message from the user is our special trigger phrase.
+    # The last message in the list is always the user's most recent one.
+    last_user_message = messages[-1]['content']
+    if last_user_message == "simulate billing error":
+        print("--- AI ENGINE: Simulating a billing error. ---")
+        # I'll raise a specific error that my app.py knows how to handle.
+        raise APIStatusError("Simulated billing error", response=None, body={"error": {"code": "insufficient_quota"}}, status_code=429)
+    # --- END OF SIMULATION LOGIC ---
+
     print(f"--- AI ENGINE: Sending {len(messages)} messages to OpenAI. ---")
     try:
         # This is the actual call to the OpenAI API, using the gpt-3.5-turbo model.
@@ -49,4 +59,3 @@ def get_ai_chat_response(messages: list):
         # This is a general catch-all for other problems, like network issues.
         print(f"[ERROR] An unexpected error occurred: {e}")
         return "Sorry, I encountered an unexpected error while processing your request."
-
