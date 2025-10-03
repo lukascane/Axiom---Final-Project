@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Axiom - Public Chats</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <nav class="bg-white shadow-sm">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <a href="/home" class="text-2xl font-bold text-gray-800">Axiom</a>
+                <div>
+                    <a href="/history" class="text-gray-600 hover:text-blue-500 mr-4">My History</a>
+                    <a href="/chat" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">New Chat</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <main class="container mx-auto p-4 mt-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6">Public Conversations</h1>
+        <div id="threads-container" class="space-y-4">
+            <!-- JavaScript will load public threads here -->
+        </div>
+    </main>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const container = document.getElementById('threads-container');
+            container.innerHTML = '<p class="text-gray-500">Loading public chats...</p>';
+            try {
+                const response = await fetch('/api/public_threads');
+                if (!response.ok) throw new Error('Failed to fetch public threads.');
+                const threads = await response.json();
+
+                if (threads.length === 0) {
+                    container.innerHTML = '<p class="text-gray-500">No public chats have been shared yet.</p>';
+                    return;
+                }
+                
+                let threadsHtml = '';
+                threads.forEach(thread => {
+                    const threadCard = `
+                        <a href="/chat/${thread.id}" class="block bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200">
+                            <h2 class="text-xl font-semibold text-gray-800 truncate">${thread.title}</h2>
+                            <p class="text-sm text-gray-500 mt-2">By: ${thread.author_email} on ${thread.created_at}</p>
+                        </a>
+                    `;
+                    threadsHtml += threadCard;
+                });
+                container.innerHTML = threadsHtml;
+            } catch (error) {
+                console.error('Failed to load public threads:', error);
+                container.innerHTML = '<p class="text-red-500">Could not load public chats. Please try again later.</p>';
+            }
+        });
+    </script>
+</body>
+</html>
+
