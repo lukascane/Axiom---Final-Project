@@ -1,4 +1,34 @@
 3.10.2025 
+
+The User History Page (history.html)
+This is my private dashboard. After I log in, this is where I will see a list of all my past conversations. I will also add the buttons here to allow me to delete a conversation or share it publicly, just like I planned in my diagram.
+
+My Explanation of the Code:
+
+Structure: I'm keeping the layout consistent with my home page, with the same navigation bar for a familiar user experience. The main area has a title and a container (div id="history-container") where my JavaScript will load my personal chat history.
+
+JavaScript Logic: This page is highly interactive.
+
+loadHistory(): As soon as this page loads, this function is called. It makes a fetch request to my /api/history endpoint. Because this is a protected route, the browser will automatically send my login cookie, so the backend knows to only send back my threads.
+
+Dynamic List & Buttons: The script then builds an HTML card for each of my conversations. I'm making sure to include a red "Delete" button and a green "Share Publicly" button on each card. The share button will change to yellow and say "Make Private" if the chat is already public.
+
+deleteThread(threadId): This function handles the delete feature. It first shows a confirmation box to make sure I don't delete something by accident. If I confirm, it sends a DELETE request to my /api/thread/<thread_id> endpoint. On a successful response, it instantly removes the card from the page, making the UI feel fast.
+
+togglePublic(threadId, button): This function manages sharing. It sends a POST request to my /api/thread/<thread_id>/toggle_public endpoint. When my backend confirms the change, the script updates the button's text and color to show the new public or private status.
+
+I'll build the public landing page for my application where anyone can see the conversations that have been shared.
+
+My Explanation of the Code:
+
+Structure: I'm creating a simple and clean layout with a navigation bar at the top that links to "My History" and "New Chat". The main part of the page has a title and a container (div id="threads-container") where I'll load the public chats.
+
+JavaScript Logic: The <script> tag at the bottom is the engine of this page. When the page loads (DOMContentLoaded), it will automatically make a fetch call to my /api/public_threads endpoint. It will then dynamically build an HTML card for each public conversation it receives from the server, showing the title, author, and date. This makes the page feel live and interactive.
+
+My Action:
+I will now create a new file named home.html inside my axiom-app/templates folder and add the following code.
+
+
 My Step-by-Step Implementation Plan
 My goal is to build out the full user experience from my diagram. This means creating new pages for public chats and my private history, and adding more features to the chat page itself. This requires a major update to my app.py file to handle the new logic and the creation of new HTML files for the frontend.
 

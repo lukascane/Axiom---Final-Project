@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My History - Axiom</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+     <nav class="bg-white shadow-sm">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-between items-center py-4">
+                <a href="/home" class="text-2xl font-bold text-gray-800">Axiom</a>
+                <div>
+                    <a href="/home" class="text-gray-600 hover:text-blue-500 mr-4">Public Chats</a>
+                    <a href="/chat" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">New Chat</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <main class="container mx-auto p-4 mt-8">
+        <h1 class="text-3xl font-bold text-gray-800 mb-6">My Conversation History</h1>
+        <div id="history-container" class="space-y-4">
+            <!-- My JavaScript will load my chat history here -->
+        </div>
+    </main>
+
+    <script>
+        async function loadHistory() {
+            const container = document.getElementById('history-container');
+            container.innerHTML = '<p class="text-gray-500">Loading your history...</p>';
+            try {
+                const response = await fetch('/api/history');
+                // If I'm not logged in, the server will redirect me. This handles that.
+                if (response.redirected) {
+                    window.location.href = response.url;
+                    return;
+                }
+                if (!response.ok) throw new Error('Failed to fetch history.');
+                const threads = await response.json();
+
+                if (threads.length === 0) {
+                    container.innerHTML = '<p class="text-gray-500">You have no chat history yet. <a href="/chat" class="text-blue-500 hover:underline">Start a new chat!</a></p>';
+                    return;
+                }
+
+                let threadsHtml = '';
+                threads.forEach(thread => {
+                    const threadCard = `
+                        <div class="bg-white p-6 rounded-lg shadow-md" id="thread-card-${thread.id}">
+                            <a href="/chat/${thread.id}" class="block hover:bg-gray-50 -m-6 p-6 rounded-t-lg">
+                                <h2 class="text-xl font-semibold text-gray-800 truncate">${thread.title}</h2>
+                                <p class="text-sm text-gray-500 mt-2">Started on: ${thread.created_at}</p>
+                            </a>
+                            <div class="mt-4 pt-4 border-t flex justify-between items-center">
+                                <button onclick="togglePublic(${thread.id}, this)" class="text-sm px-4 py-2 rounded-md transition-colors duration-200 ${thread.is_public ? 'bg-yellow-500 hover:bg-yellow-600 text-white' : 'bg-green-500 hover:bg-green-600 text-white'}">
+                                    ${thread.is_public ? 'Make Private' : 'Share Publicly'}
+                                </button>
+                                <button onclick="deleteThread(${thread.id})" class="text-sm px-4 py-2 rounded-md bg-red-500 text-white hover:bg-red-600 transition-colors duration-200">
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    threadsHtml += threadCard;
+                });
+                container.innerHTML = threadsHtml;
+            } catch (error) {
+                console.error('Failed to load history:', error);
+                container.innerHTML = '<p class="text-red-500">Could not load your history. You may need to <a href="/login" class="text-blue-500 hover:underline">log in</a> again.</p>';
+            }
+        }
+
+        async function togglePublic(threadId, button) {
+            try {
+                const response = await fetch(`/api/thread/${threadId}/toggle_public`, { method: 'POST' });
+                const data = await response.json();
+                if (response.ok) {
+                    // I'll update the button's appearance and text based on the new state.
+                    if (data.is_public) {
+                        button.textContent = 'Make Private';
+                        button.classList.remove('bg-green-500', 'hover:bg-green-600');
+                        button.classList.add('bg-yellow-500', 'hover:bg-yellow-600');
+                    } else {
+                        button.textContent = 'Share Publicly';
+                        button.classList.remove('bg-yellow-500', 'hover:bg-yellow-600');
+                        button.classList.add('bg-green-500', 'hover:bg-green-600');
+                    }
+                } else {
+                    alert(data.error || 'Failed to update status.');
+                }
+            } catch (error) {
+                alert('An error occurred while updating visibility.');
+            }
+        }
+
+        async function deleteThread(threadId) {
+            // I'm using confirm() to make sure I don't delete a chat by accident.
+            if (!confirm('Are you sure you want to permanently delete this chat?')) {
+                return;
+            }
+            try {
+                const response = await fetch(`/api/thread/${threadId}`, { method: 'DELETE' });
+                if (!response.ok) {
+                     const data = await response.json();
+                     throw new Error(data.error || 'Failed to delete thread');
+                }
+                // I'll remove the card from the page for an instant UI update.
+                const card = document.getElementById(`thread-card-${threadId}`);
+                card.remove();
+                
+                // If I've deleted the last chat, I'll show the "no history" message.
+                const container = document.getElementById('history-container');
+                if (container.children.length === 0) {
+                    container.innerHTML = '<p class="text-gray-500">You have no chat history yet. <a href="/chat" class="text-blue-500 hover:underline">Start a new chat!</a></p>';
+                }
+
+            } catch (error) {
+                alert(`An error occurred: ${error.message}`);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadHistory);
+    </script>
+</body>
+</html>
+
