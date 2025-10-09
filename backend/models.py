@@ -1,40 +1,67 @@
+# models.py
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import UserMixin
 from datetime import datetime
 
 db = SQLAlchemy()
 
-class Thread(db.Model):
-    __tablename__ = 'threads'
+
+# --- USER MODEL ---
+class User(UserMixin, db.Model):
+    __tablename__ = 'users'
+
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(200), nullable=False, default="New Conversation")
-    user_id = db.Column(db.Integer, nullable=False) # We will keep this simple for now
-    is_public = db.Column(db.Boolean, default=True, nullable=False)
-    created_date = db.Column(db.DateTime, default=datetime.utcnow)
-    messages = db.relationship('Message', backref='thread', lazy=True, cascade="all, delete-orphan")
+    email = db.Column(db.String(120), unique=True, nullable=False)
+    password_hash = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationship to threads
+    threads = db.relationship('ChatThread', backref='author', lazy=True, cascade="all, delete-orphan")
 
     def to_dict(self):
         return {
             "id": self.id,
-            "title": self.title,
-            "user_id": self.user_id,
-            "is_public": self.is_public,
-            "created_date": self.created_date.isoformat()
+            "email": self.email,
+            "created_at": self.created_at.isoformat(),
         }
 
-class Message(db.Model):
+
+# --- CHAT THREAD MODEL ---
+class ChatThread(db.Model):
+    __tablename__ = 'threads'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    is_public = db.Column(db.Boolean, default=True, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationship to messages
+    messages = db.relationship('ChatMessage', backref='thread', lazy=True, cascade="all, delete-orphan")
+
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "user_id": self.user_id,
+            "is_public": self.is_public,
+            "created_at": self.created_at.isoformat(),
+        }
+
+
+# --- CHAT MESSAGE MODEL ---
+class ChatMessage(db.Model):
     __tablename__ = 'messages'
+
     id = db.Column(db.Integer, primary_key=True)
     thread_id = db.Column(db.Integer, db.ForeignKey('threads.id'), nullable=False)
-    content = db.Column(db.Text, nullable=False)
-    role = db.Column(db.String(50), nullable=False) # 'user' or 'assistant'
-    created_date = db.Column(db.DateTime, default=datetime.utcnow)
+    role = db.Column(db.String(50), nullable=False)  # 'user' or 'assistant'
+    message = db.Column(db.Text, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def to_dict(self):
         return {
             "id": self.id,
             "thread_id": self.thread_id,
-            "content": self.content,
             "role": self.role,
-            "created_date": self.created_date.isoformat()
+            "message": self.message,
+            "created_at": self.created_at.isoformat(),
         }
-
