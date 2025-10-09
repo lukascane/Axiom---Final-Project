@@ -70,3 +70,33 @@ def get_ai_chat_response(messages: list):
         print(f"[ERROR] An unexpected error occurred: {e}")
         return "Sorry, I encountered an unexpected error while processing your request."
 
+# =====================================================================
+# V V V V V V V V V    NEW TESTING BLOCK ADDED BELOW    V V V V V V V V
+# =====================================================================
+
+# This block only runs when you execute `python engine.py` directly.
+# It will NOT run when this file is imported by app.py.
+if __name__ == '__main__':
+    print("--- Running AI Engine in direct test mode... ---")
+
+    # 1. Create a sample conversation history, just like your app would.
+    test_messages = [
+        {"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "Explain the theory of relativity in one simple sentence."}
+    ]
+
+    # 2. Call your function with the test data.
+    response = get_ai_chat_response(test_messages)
+
+    # 3. Print the results.
+    print("\n--- TEST COMPLETE ---")
+    print(f"Test Prompt: {test_messages[-1]['content']}")
+    print(f"AI Response: {response}")
+    print("---------------------\n")
+    
+    # You can also test your error simulation
+    print("--- Testing error simulation... ---")
+    error_test_messages = [{"role": "user", "content": "simulate billing error"}]
+    error_response = get_ai_chat_response(error_test_messages)
+    print(f"AI Response to simulated error: {error_response}")
+    print("---------------------------------")
