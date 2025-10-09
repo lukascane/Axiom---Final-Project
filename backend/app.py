@@ -1,4 +1,17 @@
 # --- IMPORTS ---
+# app.py
+from dotenv import load_dotenv
+import os
+
+# Load .env automatically
+load_dotenv()
+
+# Optional sanity check
+print("Loaded OPENAI_API_KEY:", bool(os.getenv("OPENAI_API_KEY")))
+
+from flask import Flask
+app = Flask(__name__)
+
 # I need to add 'redirect' and 'url_for' to handle navigation between my new pages.
 from flask import Flask, request, jsonify, render_template, redirect, url_for
 from models import db, Thread, Message
