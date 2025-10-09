@@ -23,7 +23,7 @@
             <!-- Header -->
             <div class="p-4 border-b flex justify-between items-center">
                 <h1 class="text-xl font-bold">Axiom AI Chat</h1>
-                <!-- I'm using a Jinja2 'if' statement to show the correct link based on who is viewing. -->
+                <!-- I'm using a Jinja2 'if' statement to show the correct link based on context. -->
                 {% if is_owner %}
                 <a href="/history" class="text-sm text-blue-500 hover:underline">Back to History</a>
                 {% else %}
@@ -33,7 +33,7 @@
 
             <!-- Message Display Area -->
             <div id="chat-window" class="flex-1 p-4 overflow-y-auto space-y-4">
-                <!-- My JavaScript will load messages here -->
+                <!-- My JavaScript will dynamically load all messages here -->
             </div>
 
             <!-- Message Input Area -->
@@ -49,7 +49,7 @@
                     </button>
                 </div>
                 <div id="limit-message" class="text-center text-gray-500 text-sm mt-2 hidden">
-                    Conversation limit reached. <a href="/chat" class="text-blue-500 hover:underline">Start a new chat.</a>
+                    Conversation limit reached. <a href="/chat" class="text-blue-500">Start a new chat.</a>
                 </div>
                 {% else %}
                 <div class="text-center text-gray-500 text-sm">
@@ -98,5 +98,122 @@
                 messageInput.disabled = isLoading;
                 sendButton.disabled = isLoading;
                 if (isLoading) {
-                    sendButton.classList
+                    sendButton.classList.add('cursor-not-allowed', 'opacity-50');
+                    addMessageToChat('assistant', '...');
+                } else {
+                    sendButton.classList.remove('cursor-not-allowed', 'opacity-50');
+                    const allBubbles = chatWindow.querySelectorAll('.flex.justify-start div');
+                    const lastBubble = allBubbles[allBubbles.length - 1];
+                    if (lastBubble && lastBubble.innerText === '...') {
+                        lastBubble.parentElement.remove();
+                    }
+                }
+            };
+            
+            const handleConversationLimit = () => {
+                if (!IS_OWNER) return;
+                inputArea.classList.add('hidden');
+                limitMessage.classList.remove('hidden');
+            };
+
+            const startNewThread = async () => {
+                try {
+                    addMessageToChat('assistant', 'Starting a new conversation...');
+                    const response = await fetch('/api/chat/start', { method: 'POST' });
+                    // If I'm not logged in, the server will redirect, and I need to follow it.
+                     if (response.redirected) {
+                        window.location.href = response.url;
+                        return;
+                    }
+                    if (!response.ok) throw new Error('Could not start a new thread.');
+                    
+                    const data = await response.json();
+                    // After creating the new thread, I'll reload the page to the new URL.
+                    window.location.href = `/chat/${data.thread_id}`;
+                } catch (error) {
+                    console.error('Error starting thread:', error);
+                    addMessageToChat('assistant', 'Error: Could not start a new chat session. Please log in and try again.');
+                }
+            };
+
+            const loadHistory = async () => {
+                try {
+                    const response = await fetch(`/api/chat/${threadId}`);
+                    if (!response.ok) throw new Error('Could not load history.');
+                    const messages = await response.json();
+                    
+                    messages.forEach(msg => addMessageToChat(msg.role, msg.message));
+                    
+                    const userMessages = messages.filter(m => m.role === 'user').length;
+                    if (userMessages >= 5 && IS_OWNER) {
+                        handleConversationLimit();
+                    }
+
+                } catch (error) {
+                    console.error("Failed to load history", error);
+                    addMessageToChat('assistant', 'Could not load chat history.');
+                }
+            };
+
+            const sendMessage = async () => {
+                const messageText = messageInput.value.trim();
+                if (!messageText || !threadId) return;
+
+                addMessageToChat('user', messageText);
+                messageInput.value = '';
+                toggleLoadingState(true);
+
+                try {
+                    const response = await fetch(`/api/chat/${threadId}/message`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ message: messageText }),
+                    });
+
+                    toggleLoadingState(false);
+                    const data = await response.json();
+                    
+                    if (response.status === 403) { // Specifically handle conversation limit
+                        addMessageToChat('assistant', data.error);
+                        handleConversationLimit();
+                    } else if (!response.ok) {
+                        throw new Error(data.error || 'An unknown error occurred.');
+                    } else {
+                        addMessageToChat('assistant', data.message);
+                    }
+
+                } catch (error) {
+                    toggleLoadingState(false);
+                    console.error('Error sending message:', error);
+                    addMessageToChat('assistant', `Error: ${error.message}`);
+                }
+            };
+
+            // This is my main logic that decides what to do when the page loads.
+            if (threadId) {
+                // If I'm on a page for an existing chat, I'll load its history.
+                loadHistory();
+                if (IS_OWNER) {
+                    messageInput.disabled = false;
+                    sendButton.disabled = false;
+                    sendButton.classList.remove('cursor-not-allowed');
+                }
+            } else {
+                // If I'm on the generic /chat page, I'll start a new thread automatically.
+                startNewThread();
+            }
+            
+            if (IS_OWNER) {
+                sendButton.addEventListener('click', sendMessage);
+                messageInput.addEventListener('keydown', (event) => {
+                    if (event.key === 'Enter' && !messageInput.disabled) {
+                        sendMessage();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
+
 
