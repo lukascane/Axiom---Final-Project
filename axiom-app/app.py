@@ -8,6 +8,7 @@ from engine import get_ai_chat_response
 from flask_cors import CORS
 
 
+
 # --- APP SETUP & CONFIGURATION ---
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'a-super-secret-key-that-no-one-will-guess'
@@ -24,6 +25,15 @@ login_manager.login_view = 'login_page'
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
+
+# --- APP SETUP ---
+app = Flask(__name__)
+
+# 2. Initialize CORS with your app instance
+CORS(app)
+
+# Configure the database. SQLite is a simple file-based database.
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 
 # --- NEW: HTML PAGE ROUTES ---
 
