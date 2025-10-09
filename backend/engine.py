@@ -100,3 +100,4 @@ if __name__ == '__main__':
     error_response = get_ai_chat_response(error_test_messages)
     print(f"AI Response to simulated error: {error_response}")
     print("---------------------------------")
+    
