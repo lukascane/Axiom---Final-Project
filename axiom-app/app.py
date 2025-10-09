@@ -5,6 +5,8 @@ from models import db, User, ChatThread, ChatMessage
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
 from engine import get_ai_chat_response
+from flask_cors import CORS
+
 
 # --- APP SETUP & CONFIGURATION ---
 app = Flask(__name__)
