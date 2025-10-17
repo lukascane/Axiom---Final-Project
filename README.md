@@ -1,3 +1,64 @@
+16-17.10.2025:
+I’m focusing on the few-shot part of prompt engineering: I’ll provide examples to the model before it answers and then test different chain-of-thought styles. I’ll combine materials and iterate across several prompting techniques. I’ll build a comparison table where I paste the full messages (system, assistant, user), record token cost, and write short evaluations so I can justify decisions to a supervisor.
+
+I’ll start tests in English because models perform best in English. I’ll let users use a higher-quality model for their first 2–5 prompts, then downgrade them to a cheaper model to prevent token overuse. If we need real-time facts, I’ll implement RAG by fetching search results (for example via Tavily or Brave Search) and feeding that into the prompt.
+
+I’ll keep the testing workflow strict: keep the model constant while varying prompts first; log everything in a table; iterate; then run cross-model comparisons once the prompts are stable.
+
+Repository reference: lukascane/Axiom---Final-Project — I reviewed the project README and structure to confirm backend readiness for AI integration.
+
+
+Phase A — Setup & Baseline
+
+Confirm environment & API keys: Ensure .env contains valid OpenAI (and other API) keys and the backend loads them (app shows it reads keys). (Repo checked.) citeturn0view0
+
+Create an engine.py test harness: small module that accepts system prompt + user prompt + model selection + returns response + token usage. Log full request/response pairs.
+
+Define canonical test questions: prepare 6–9 diverse user questions (factual/historical, recent events, reasoning/chain-of-thought, multi-step tasks, translation) to use across all experiments.
+
+Create 6–8 candidate system prompts: short, medium, and long variants; include a few-shot template with 2–3 examples; include an instruction that asks for structure (bulleted answer, TL;DR, steps, citations).
+
+Run baseline tests: use one stable model (e.g., gpt-4 family or gpt-3.5-turbo depending on local access) and test each prompt with every canonical question. Collect responses and costs.
+
+Phase B — Evaluate & Compare
+
+Build the comparison table (template included below). Fill it with results from Phase A.
+
+For each prompt/question pair, evaluate: correctness, completeness, concision, hallucination risk, and token cost.
+
+Rank prompts by a score (e.g., weighted sum: correctness 40%, hallucination 30%, concision 10%, cost 20%).
+
+Choose top 2 prompt templates per question type.
+
+Phase C — Cross-model & RAG
+
+Run the top prompts across selected models (gpt-4 variant, gpt-4o-mini or gpt-4-mini if available, gpt-3.5-turbo, and Gemini 1.5 if accessible) to compare model-vs-prompt tradeoffs.
+
+Implement a simple RAG pipeline: query a search API, ingest top-3 snippets into the system prompt as evidence, and re-query the model. Compare accuracy on up-to-date questions.
+
+Define token-management policy in the backend: premium-first-n-prompts then downgrade logic plus a small payment gate for ongoing premium access.
+
+Phase D — Reporting & Production
+
+Finalize the comparison table and write a short decision memo for the supervisor with recommendations: default prompt, fallback models, RAG usage, and token management.
+
+Add tests to CI (simple smoke tests that ensure engine.py returns well-formed responses for canonical prompts).
+
+Implement UI flows to show users which model they are using and when they will be downgraded.
+
+
+I will create engine.py and a tests/prompt_tests/ folder in the repo to store scripts that run the experiments. (I reviewed repo structure and it’s ready for this — see README notes.) citeturn0view0
+
+Prepare the canonical question set (I can draft this if you want).
+
+Create the 6–8 system prompts and 2–3 few-shot examples.
+
+Run Phase A baseline experiments and fill the testing sheet.
+
+We will schedule a short checkpoint after the baseline so we can select which prompts to push into cross-model tests.
+
+
+
 8 -9.10.25
 Backend Refactoring & Stability
 Fixed Critical Bug: Resolved a RuntimeError by refactoring app.py to use a single, correctly initialized Flask instance. This ensures that SQLAlchemy and Flask-Login are properly registered with the app.
