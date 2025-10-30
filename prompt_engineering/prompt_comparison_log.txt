@@ -1,7 +1,7 @@
 An error occurred: module 'importlib.metadata' has no attribute 'packages_distributions'
 --- Starting Prompt Engineering Test Suite ---
 --- Using OpenAI Model: gpt-4o-mini ---
---- Using Google Model: gemini-1.5-flash ---
+--- Using Google Model: models/gemini-1.5-flash ---
 
 ================================
 🧪 TESTING TECHNIQUE: 1. Standard (Zero-Shot)
@@ -13,10 +13,89 @@ An error occurred: module 'importlib.metadata' has no attribute 'packages_distri
 --- OpenAI (gpt-4o-mini) ---
 Let's break down the statement: "Brothers and sisters I have none, but that man's father is my father's son."
 
-1. The man has no brothers or sisters, so "my father's son" refers to himself.
-2. Therefore, "that man's father is my father's son" means "that man's father is me."
+1. The man has no brothers or sisters, which means "my father's son" refers to himself.
+2. Therefore, "that man's father is my father's son" can be rephrased as "that man's father is me."
 
 This means that the man in the portrait is his son. So, the person in the portrait is the man's son.
-[OpenAI Tokens: Prompt=72, Completion=89, Total=161]
+[OpenAI Tokens: Prompt=72, Completion=95, Total=167]
 
---- Google (gemini-1.5-flash) ---
+--- Google (models/gemini-1.5-flash) ---
+--- API Call Failed for Google on prompt 'A man is looking at ...': 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+ERROR: 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+[Google Tokens: Prompt=0, Completion=0, Total=0]
+
+--- Question Type: Factual Nuance (Historical) ---
+--- Prompt: Who invented the electric light bulb? Be specific about the difference between the patent for the first commercially viable bulb and the invention of the concept. Today's date is October 30, 2025. ---
+
+--- OpenAI (gpt-4o-mini) ---
+The invention of the electric light bulb is often attributed to Thomas Edison, who developed the first commercially viable incandescent light bulb in 1879. However, the concept of electric lighting predates Edison, with several inventors contributing to its development.
+
+Before Edison's work, Sir Humphry Davy created an early form of electric light in 1802 with the arc lamp, and in the 1850s, Heinrich Göbel and Joseph Swan made significant advancements in incandescent lighting. Swan, a British physicist, developed a working incandescent lamp around the same time as Edison and was granted a British patent for his version in 1878.
+
+Edison's key innovation was not just the bulb itself but the entire electrical system that made it practical for widespread use, including the development of a vacuum inside the bulb to prolong its life and a reliable electrical distribution system. He received a U.S. patent for his version of the incandescent light bulb on January 27, 1880 (U.S. Patent No. 223,898).
+
+In summary, while the concept of electric lighting had been explored by various inventors, Edison's patent in 1880 marked the creation of the first commercially viable incandescent light bulb, which was crucial for its adoption and use in homes and businesses.
+[OpenAI Tokens: Prompt=58, Completion=257, Total=315]
+
+--- Google (models/gemini-1.5-flash) ---
+--- API Call Failed for Google on prompt 'Who invented the ele...': 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+ERROR: 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+[Google Tokens: Prompt=0, Completion=0, Total=0]
+
+--- Question Type: Up-to-Date (Current Event) ---
+--- Prompt: As of today, October 30, 2025, what are the key differences in features and pricing between the Google Pixel 9 and the iPhone 16? ---
+
+--- OpenAI (gpt-4o-mini) ---
+As of October 30, 2025, here are the key differences in features and pricing between the Google Pixel 9 and the iPhone 16:
+
+### Google Pixel 9
+
+**Features:**
+- **Display:** 6.4-inch OLED display with a 120Hz refresh rate.
+- **Processor:** Google Tensor G4 chip, optimized for AI and machine learning tasks.
+- **Camera System:** Triple rear camera setup (50 MP wide, 12 MP ultra-wide, 48 MP telephoto) with advanced computational photography features.
+- **Battery Life:** 5000 mAh battery with fast charging and wireless charging capabilities.
+- **Software:** Runs on Android 14 with a clean, stock experience and regular updates directly from Google.
+- **Storage Options:** Available in 128GB, 256GB, and 512GB variants.
+- **5G Connectivity:** Supports both sub-6GHz and mmWave 5G.
+- **Unique Features:** Enhanced Google Assistant integration, real-time translation, and exclusive Pixel features like Magic Eraser and Call Screen.
+
+**Pricing:**
+- Starting price: Approximately $799 for the base model (128GB).
+- Higher storage options increase the price, with the 512GB model reaching around $1,099.
+
+### iPhone 16
+
+**Features:**
+- **Display:** 6.1-inch Super Retina XDR display with ProMotion technology (120Hz refresh rate).
+- **Processor:** A17 Bionic chip, known for its high performance and efficiency.
+- **Camera System:** Dual rear camera setup (48 MP wide, 12 MP ultra-wide) with advanced computational photography and video capabilities, including ProRAW and ProRes video recording.
+- **Battery Life:** 3500 mAh battery with fast charging and MagSafe wireless charging.
+- **Software:** Runs on iOS 18 with a focus on privacy, security, and a seamless ecosystem experience.
+- **Storage Options:** Available in 128GB, 256GB, 512GB, and 1TB variants.
+- **5G Connectivity:** Supports both sub-6GHz and mmWave 5G.
+- **Unique Features:** Deep integration with Apple services, Face ID, and features like Live Text and Focus modes.
+
+**Pricing:**
+- Starting price: Approximately $999 for the base model (128GB).
+- Higher storage options increase the price, with the 1TB model reaching around $1,499.
+
+### Summary of Key Differences:
+- **Display Size:** Pixel 9 has a larger display (6.4 inches) compared to the iPhone 16 (6.1 inches).
+- **Camera System:** The Pixel 9 has a more versatile triple-camera setup, while the iPhone 16 focuses on dual cameras with advanced video capabilities.
+- **Processor:** The Pixel uses Google’s Tensor G4, while the iPhone features Apple’s A17 Bionic chip, which is generally regarded as more powerful.
+- **Battery Capacity:** The Pixel 9 has a larger battery capacity (5000 mAh) compared to the iPhone 16 (3500 mAh).
+- **Pricing:** The Pixel 9 starts at a lower price point ($799) compared to the iPhone 16 ($999).
+
+These differences highlight the distinct approaches of Google and Apple in their flagship smartphones, catering to different user preferences and ecosystems.
+[OpenAI Tokens: Prompt=53, Completion=684, Total=737]
+
+--- Google (models/gemini-1.5-flash) ---
+--- API Call Failed for Google on prompt 'As of today, October...': 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+ERROR: 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
+[Google Tokens: Prompt=0, Completion=0, Total=0]
+
+--- Question Type: Tricky (Bias/Ambiguity) ---
+--- Prompt: Explain why solar power is overwhelmingly superior to nuclear power in every single aspect, including cost, reliability, and environmental impact. Today's date is October 30, 2025. ---
+
+--- OpenAI (gpt-4o-mini) ---

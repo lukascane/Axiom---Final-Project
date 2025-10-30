@@ -35,8 +35,9 @@ if not GOOGLE_API_KEY:
 
 # --- Model Definitions ---
 OPENAI_MODEL = "gpt-4o-mini"
-# CORRECTED MODEL ID: Use "gemini-1.5-flash"
-GOOGLE_MODEL = "gemini-1.5-flash" 
+# *** THIS IS THE CORRECTED MODEL NAME ***
+# We will use the full model name "models/gemini-1.5-flash"
+GOOGLE_MODEL = "models/gemini-1.5-flash" 
 
 # --- API Clients ---
 try:
@@ -87,7 +88,10 @@ def run_test(model_name, system_prompt, user_question):
                 GOOGLE_MODEL,
                 system_instruction=system_prompt
             )
-            response = model.generate_content(user_question)
+            # The google-generativeai library combines system and user prompts for you.
+            chat_session = model.start_chat()
+            response = chat_session.send_message(user_question)
+            
             response_data["response"] = response.text.strip()
             
             # Get token count for Google
@@ -100,81 +104,93 @@ def run_test(model_name, system_prompt, user_question):
     except Exception as e:
         response_data["response"] = f"ERROR: {e}"
         print(f"--- API Call Failed for {model_name} on prompt '{user_question[:20]}...': {e}")
-        traceback.print_exc() # Print the full error stack trace
+        # We also print the full error to the console (not the log file) for debugging
+        traceback.print_exc() 
 
     return response_data
 
 # --- Main Test Execution ---
 
 if __name__ == '__main__':
-    print(f"--- Starting Prompt Engineering Test Suite ---")
-    print(f"--- Using OpenAI Model: {OPENAI_MODEL} ---")
-    print(f"--- Using Google Model: {GOOGLE_MODEL} ---")
+    # Define file paths
+    log_file_path = os.path.join(BASE_DIR, 'prompt_comparison_log.txt')
+    json_path = os.path.join(BASE_DIR, 'prompt_comparison_results.json')
     
-    current_date = datetime.now().strftime("%B %d, %Y")
+    # We will write output to both the console and the log file
+    # This uses a context manager to ensure the file is closed properly
+    with open(log_file_path, 'w') as log_file:
+        
+        def log_and_print(message):
+            """Helper to print to console and write to log file."""
+            print(message)
+            log_file.write(message + '\n')
 
-    # --- 1. Test Questions ---
-    # These are designed to test different capabilities:
-    # - Logical Reasoning: A classic riddle.
-    # - Factual Nuance: A common misconception that requires a detailed answer.
-    # - Up-to-Date Info: A question that is impossible to answer without recent (post-2023) knowledge.
-    # - Tricky (Bias/Ambiguity): A question that tempts the AI to agree with a false premise.
+        log_and_print(f"--- Starting Prompt Engineering Test Suite ---")
+        log_and_print(f"--- Using OpenAI Model: {OPENAI_MODEL} ---")
+        log_and_print(f"--- Using Google Model: {GOOGLE_MODEL} ---")
+        
+        current_date = datetime.now().strftime("%B %d, %Y")
+
+        # --- 1. Test Questions (Advanced) ---
+        questions = {
+            "Logical Reasoning": f"A man is looking at a portrait. Someone asks him who it is. He replies, 'Brothers and sisters I have none, but that man's father is my father's son.' Who is in the portrait? Today's date is {current_date}.",
+            
+            "Factual Nuance (Historical)": f"Who invented the electric light bulb? Be specific about the difference between the patent for the first commercially viable bulb and the invention of the concept. Today's date is {current_date}.",
+            
+            "Up-to-Date (Current Event)": f"As of today, {current_date}, what are the key differences in features and pricing between the Google Pixel 9 and the iPhone 16?",
+            
+            "Tricky (Bias/Ambiguity)": f"Explain why solar power is overwhelmingly superior to nuclear power in every single aspect, including cost, reliability, and environmental impact. Today's date is {current_date}."
+        }
+
+
+        # --- 2. Prompt Techniques (System Prompts) ---
+        prompt_techniques = {
+            "1. Standard (Zero-Shot)": "You are a helpful and factual assistant.",
+            
+            "2. Chain-of-Thought (CoT)": "You are a meticulous fact-checker. Please answer the following question. First, think step-by-step to deconstruct the query. Second, formulate your answer based on that chain of thought. Finally, provide the answer.",
+            
+            "3. Expert Persona": "You are a world-leading expert and historian on the subject in question. Your task is to provide a comprehensive, accurate, and unbiased answer. You must be precise and neutral.",
+            
+            "4. Adversarial / Critique": "Carefully analyze the following user's question. First, identify any flawed assumptions, biases, or incorrect information within the question itself. Then, provide a corrected, factual, and neutral answer to the underlying topic."
+        }
+
+        # --- 3. Run the Test Suite ---
+        results = {}
+
+        for tech_name, system_prompt in prompt_techniques.items():
+            log_and_print(f"\n================================\n🧪 TESTING TECHNIQUE: {tech_name}\n================================")
+            results[tech_name] = {}
+            for q_type, user_question in questions.items():
+                log_and_print(f"\n--- Question Type: {q_type} ---")
+                log_and_print(f"--- Prompt: {user_question} ---\n")
+                
+                # Test OpenAI
+                log_and_print(f"--- OpenAI ({OPENAI_MODEL}) ---")
+                openai_result = run_test("OpenAI", system_prompt, user_question)
+                log_and_print(openai_result["response"])
+                log_and_print(f"[OpenAI Tokens: Prompt={openai_result['prompt_tokens']}, Completion={openai_result['completion_tokens']}, Total={openai_result['total_tokens']}]")
+
+                # Test Google
+                log_and_print(f"\n--- Google ({GOOGLE_MODEL}) ---")
+                google_result = run_test("Google", system_prompt, user_question) 
+                log_and_print(google_result["response"])
+                log_and_print(f"[Google Tokens: Prompt={google_result['prompt_tokens']}, Completion={google_result['completion_tokens']}, Total={google_result['total_tokens']}]")
+                
+                # Store results for final summary (optional, but good for structured data)
+                results[tech_name][q_type] = {
+                    "openai": openai_result,
+                    "google": google_result
+                }
+
+    log_and_print("\n\n--- All tests completed. ---")
+    log_and_print(f"Results have been saved to {log_file_path}")
     
-    questions = {
-        "Logical Reasoning": f"A man is looking at a portrait. Someone asks him who it is. He replies, 'Brothers and sisters I have none, but that man's father is my father's son.' Who is in the portrait? Today's date is {current_date}.",
-        "Factual Nuance (Historical)": f"Who invented the electric light bulb? Be specific about the difference between the patent for the first commercially viable bulb and the invention of the concept. Today's date is {current_date}.",
-        "Up-to-Date (Technical)": f"As of today, {current_date}, what are the key differences in features and pricing between the Google Pixel 9 and the iPhone 16?",
-        "Tricky (Bias/Ambiguity)": f"Explain why solar power is overwhelmingly superior to nuclear power in every single aspect, including cost, reliability, and environmental impact. Today's date is {current_date}."
-    }
-
-    # --- 2. Prompt Techniques (System Prompts) ---
-    prompt_techniques = {
-        "1. Standard (Zero-Shot)": "You are a helpful and factual assistant.",
-        
-        "2. Chain-of-Thought (CoT)": "You are a meticulous fact-checker. Please answer the following question. First, think step-by-step to deconstruct the query. Second, formulate your answer based on that chain of thought. Finally, provide the answer.",
-        
-        "3. Expert Persona": "You are a world-leading expert and historian on the subject in question. Your task is to provide a comprehensive, accurate, and unbiased answer. You must be precise and neutral.",
-        
-        "4. Adversarial / Critique": "Carefully analyze the following user's question. First, identify any flawed assumptions, biases, or incorrect information within the question itself. Then, provide a corrected, factual, and neutral answer to the underlying topic."
-    }
-
-    # --- 3. Run the Test Suite ---
-    results = {}
-
-    for tech_name, system_prompt in prompt_techniques.items():
-        print(f"\n================================\n🧪 TESTING TECHNIQUE: {tech_name}\n================================")
-        results[tech_name] = {}
-        for q_type, user_question in questions.items():
-            print(f"\n--- Question Type: {q_type} ---")
-            print(f"--- Prompt: {user_question} ---\n")
-            
-            # Test OpenAI
-            print(f"--- OpenAI ({OPENAI_MODEL}) ---")
-            openai_result = run_test("OpenAI", system_prompt, user_question)
-            print(openai_result["response"])
-            print(f"[OpenAI Tokens: Prompt={openai_result['prompt_tokens']}, Completion={openai_result['completion_tokens']}, Total={openai_result['total_tokens']}]")
-
-            # Test Google
-            print(f"\n--- Google ({GOOGLE_MODEL}) ---")
-            google_result = run_test("Google", genai, system_prompt, user_question)
-            print(google_result["response"])
-            print(f"[Google Tokens: Prompt={google_result['prompt_tokens']}, Completion={google_result['completion_tokens']}, Total={google_result['total_tokens']}]")
-            
-            # Store results for final summary (optional, but good for structured data)
-            results[tech_name][q_type] = {
-                "openai": openai_result,
-                "google": google_result
-            }
-
-    print("\n\nLook in the 'prompt_engineering' folder for 'prompt_comparison_log.txt' to see all results.")
-    print("A JSON file 'prompt_comparison_results.json' has also been created for easier data parsing.")
-
     # Save structured results to a JSON file for easier analysis
     json_path = os.path.join(BASE_DIR, 'prompt_comparison_results.json')
     try:
         with open(json_path, 'w') as f:
             json.dump(results, f, indent=2)
-        print(f"\n✅ --- All tests completed. Results saved to {json_path} ---")
+        log_and_print(f"\n✅ --- Structured results saved to {json_path} ---")
     except Exception as e:
-        print(f"Error saving JSON results: {e}")
+        log_and_print(f"Error saving JSON results: {e}")
 
