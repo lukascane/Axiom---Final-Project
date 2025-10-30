@@ -244,3 +244,218 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     app.run(debug=True, port=5001)
+# ==============================================================================
+#  1. IMPORTS & INITIAL SETUP
+# ==============================================================================
+import os
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+from flask_sqlalchemy import SQLAlchemy
+from flask_login import (
+    LoginManager,
+    UserMixin,
+    login_user,
+    logout_user,
+    login_required,
+    current_user,
+)
+from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
+
+# --- AI Engine Import ---
+# Import our most advanced AI function that uses real-time web search.
+from engine import get_ai_response_with_search
+
+# --- Database Initialization ---
+# Initialize SQLAlchemy here so it can be used by the app and models.
+db = SQLAlchemy()
+
+
+# ==============================================================================
+#  2. DATABASE MODELS
+# ==============================================================================
+# UserMixin is a class from Flask-Login that includes default user methods.
+class User(UserMixin, db.Model):
+    """Represents a user in the database."""
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(100), unique=True, nullable=False)
+    password_hash = db.Column(db.String(200), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationship: A user can have many chat threads.
+    threads = db.relationship('ChatThread', backref='author', lazy=True, cascade="all, delete-orphan")
+
+class ChatThread(db.Model):
+    """Represents a single conversation or 'fact-check' session."""
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(150), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    # Relationship: A thread can have many messages.
+    messages = db.relationship('ChatMessage', backref='thread', lazy=True, cascade="all, delete-orphan")
+
+class ChatMessage(db.Model):
+    """Represents a single message within a chat thread."""
+    id = db.Column(db.Integer, primary_key=True)
+    content = db.Column(db.Text, nullable=False)
+    role = db.Column(db.String(10), nullable=False)  # 'user' or 'assistant'
+    thread_id = db.Column(db.Integer, db.ForeignKey('chat_thread.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+# ==============================================================================
+#  3. FLASK APPLICATION FACTORY
+# ==============================================================================
+def create_app():
+    """Creates and configures the Flask application."""
+    app = Flask(__name__)
+
+    # --- Configuration ---
+    # Secret key is needed for session management and security.
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'a_default_secret_key_for_development')
+    
+    # Configure the database URI. It will look for a 'db.sqlite' file.
+    basedir = os.path.abspath(os.path.dirname(__file__))
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'instance', 'db.sqlite')
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+    # --- Extensions Initialization ---
+    # Connect the database to our Flask app.
+    db.init_app(app)
+
+    # CORS allows our React frontend (on a different URL) to talk to this backend.
+    CORS(app, supports_credentials=True)
+
+    # --- Flask-Login Setup ---
+    login_manager = LoginManager()
+    login_manager.init_app(app)
+
+    @login_manager.user_loader
+    def load_user(user_id):
+        # This function tells Flask-Login how to find a specific user.
+        return db.session.get(User, int(user_id))
+    
+    # This prevents unauthorized users from getting a 404 error, sending a 401 instead.
+    @login_manager.unauthorized_handler
+    def unauthorized():
+        return jsonify({"error": "Authentication required. Please log in."}), 401
+
+
+    # ==============================================================================
+    #  4. API ROUTES
+    # ==============================================================================
+    with app.app_context():
+        # --- User Authentication Routes ---
+        @app.route('/api/register', methods=['POST'])
+        def register():
+            data = request.json
+            email = data.get('email')
+            password = data.get('password')
+
+            if not email or not password:
+                return jsonify({"error": "Email and password are required."}), 400
+            
+            if db.session.scalar(db.select(User).where(User.email == email)):
+                return jsonify({"error": "Email address already registered."}), 409
+
+            hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+            new_user = User(email=email, password_hash=hashed_password)
+            db.session.add(new_user)
+            db.session.commit()
+
+            return jsonify({"message": "User registered successfully."}), 201
+
+        @app.route('/api/login', methods=['POST'])
+        def login():
+            data = request.json
+            user = db.session.scalar(db.select(User).where(User.email == data.get('email')))
+
+            if user and check_password_hash(user.password_hash, data.get('password')):
+                login_user(user) # This handles the session cookie for us.
+                return jsonify({"message": "Login successful."})
+            
+            return jsonify({"error": "Invalid email or password."}), 401
+
+        @app.route('/api/logout', methods=['POST'])
+        @login_required # Protects this route, only logged-in users can access it.
+        def logout():
+            logout_user()
+            return jsonify({"message": "Logout successful."})
+
+        @app.route('/api/session', methods=['GET'])
+        def get_session():
+            # A route for the frontend to check if a user is currently logged in.
+            if current_user.is_authenticated:
+                return jsonify({"is_authenticated": True, "email": current_user.email})
+            return jsonify({"is_authenticated": False})
+
+
+        # --- Chat Functionality Routes ---
+        @app.route('/api/chat', methods=['POST'])
+        @login_required
+        def handle_chat():
+            data = request.json
+            user_message = data.get('message')
+            thread_id = data.get('thread_id') # Can be null if it's a new chat
+
+            if not user_message:
+                return jsonify({"error": "Message content is required."}), 400
+            
+            # If no thread_id is provided, create a new one.
+            if not thread_id:
+                # Use the first few words of the message as the title.
+                new_title = ' '.join(user_message.split()[:5]) + '...'
+                new_thread = ChatThread(title=new_title, user_id=current_user.id)
+                db.session.add(new_thread)
+                db.session.commit()
+                thread_id = new_thread.id
+            
+            # 1. Save the user's message to the database
+            user_chat_message = ChatMessage(content=user_message, role='user', thread_id=thread_id)
+            db.session.add(user_chat_message)
+            
+            # 2. Call the AI engine with real-time web search
+            ai_reply_content = get_ai_response_with_search(user_message)
+
+            # 3. Save the AI's response to the database
+            ai_chat_message = ChatMessage(content=ai_reply_content, role='assistant', thread_id=thread_id)
+            db.session.add(ai_chat_message)
+            
+            # Commit both messages at once.
+            db.session.commit()
+
+            # Return the AI's reply and the new thread_id to the frontend.
+            return jsonify({"reply": ai_reply_content, "thread_id": thread_id})
+        
+        @app.route('/api/threads', methods=['GET'])
+        @login_required
+        def get_threads():
+            # A route to get all conversation threads for the current user.
+            threads = db.session.scalars(db.select(ChatThread).where(ChatThread.user_id == current_user.id).order_by(ChatThread.created_at.desc())).all()
+            return jsonify([{"id": t.id, "title": t.title} for t in threads])
+
+        @app.route('/api/threads/<int:thread_id>', methods=['GET'])
+        @login_required
+        def get_thread_messages(thread_id):
+            # A route to get all messages for a specific conversation thread.
+            thread = db.session.get(ChatThread, thread_id)
+            if not thread or thread.user_id != current_user.id:
+                return jsonify({"error": "Thread not found or access denied."}), 404
+            
+            messages = db.session.scalars(db.select(ChatMessage).where(ChatMessage.thread_id == thread.id).order_by(ChatMessage.created_at.asc())).all()
+            return jsonify([{"role": m.role, "content": m.content} for m in messages])
+
+    return app
+
+
+# ==============================================================================
+#  5. APPLICATION EXECUTION
+# ==============================================================================
+if __name__ == '__main__':
+    # This block runs only when you execute `python app.py` directly.
+    app = create_app()
+    with app.app_context():
+        # This will create the 'db.sqlite' file and all the tables if they don't exist.
+        db.create_all()
+    app.run(debug=True) # debug=True provides helpful error messages during development.
