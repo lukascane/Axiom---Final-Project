@@ -1,7 +1,6 @@
-An error occurred: module 'importlib.metadata' has no attribute 'packages_distributions'
 --- Starting Prompt Engineering Test Suite ---
 --- Using OpenAI Model: gpt-4o-mini ---
---- Using Google Model: models/gemini-1.5-flash ---
+--- Using Google Model: gemini-2.0-flash-lite ---
 
 ================================
 🧪 TESTING TECHNIQUE: 1. Standard (Zero-Shot)
@@ -13,89 +12,364 @@ An error occurred: module 'importlib.metadata' has no attribute 'packages_distri
 --- OpenAI (gpt-4o-mini) ---
 Let's break down the statement: "Brothers and sisters I have none, but that man's father is my father's son."
 
-1. The man has no brothers or sisters, which means "my father's son" refers to himself.
-2. Therefore, "that man's father is my father's son" can be rephrased as "that man's father is me."
+1. The man has no brothers or sisters, so "my father's son" refers to himself.
+2. Therefore, "that man's father is my father's son" means "that man's father is me."
 
 This means that the man in the portrait is his son. So, the person in the portrait is the man's son.
-[OpenAI Tokens: Prompt=72, Completion=95, Total=167]
+[OpenAI Tokens: Prompt=72, Completion=89, Total=161]
 
---- Google (models/gemini-1.5-flash) ---
---- API Call Failed for Google on prompt 'A man is looking at ...': 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
-ERROR: 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
-[Google Tokens: Prompt=0, Completion=0, Total=0]
+--- Google (gemini-2.0-flash-lite) ---
+Here's how to solve this classic riddle:
+
+*   **"Brothers and sisters I have none..."** This means the man is an only child.
+*   **"...but that man's father is my father's son."** Since the man is an only child, his father's son can only be him. This means the man in the portrait is the speaker's son.
+
+Therefore, the person in the portrait is the speaker's **son**.
+[Google Tokens: Prompt=78, Completion=108, Total=186]
 
 --- Question Type: Factual Nuance (Historical) ---
 --- Prompt: Who invented the electric light bulb? Be specific about the difference between the patent for the first commercially viable bulb and the invention of the concept. Today's date is October 30, 2025. ---
 
 --- OpenAI (gpt-4o-mini) ---
-The invention of the electric light bulb is often attributed to Thomas Edison, who developed the first commercially viable incandescent light bulb in 1879. However, the concept of electric lighting predates Edison, with several inventors contributing to its development.
+The invention of the electric light bulb is often attributed to Thomas Edison, who developed the first commercially viable incandescent light bulb in 1879. However, the concept of electric lighting predates Edison's work, with several inventors contributing to its development.
 
-Before Edison's work, Sir Humphry Davy created an early form of electric light in 1802 with the arc lamp, and in the 1850s, Heinrich Göbel and Joseph Swan made significant advancements in incandescent lighting. Swan, a British physicist, developed a working incandescent lamp around the same time as Edison and was granted a British patent for his version in 1878.
+Before Edison, Sir Humphry Davy demonstrated an early form of electric light in the early 1800s with his arc lamp. In 1841, Frederick de Moleyns patented a bulb that used a carbon filament, but it was not practical for commercial use. Other inventors, such as Joseph Swan in the UK, also worked on incandescent bulbs around the same time as Edison.
 
-Edison's key innovation was not just the bulb itself but the entire electrical system that made it practical for widespread use, including the development of a vacuum inside the bulb to prolong its life and a reliable electrical distribution system. He received a U.S. patent for his version of the incandescent light bulb on January 27, 1880 (U.S. Patent No. 223,898).
+Edison's significant contribution was not just the invention of the light bulb itself but the development of a complete electrical lighting system, including the generation and distribution of electricity. He received a patent for his version of the incandescent light bulb on January 27, 1880 (U.S. Patent No. 223,898). This bulb used a carbon filament and was designed to last longer and be more efficient than previous designs, making it suitable for widespread commercial use.
 
-In summary, while the concept of electric lighting had been explored by various inventors, Edison's patent in 1880 marked the creation of the first commercially viable incandescent light bulb, which was crucial for its adoption and use in homes and businesses.
-[OpenAI Tokens: Prompt=58, Completion=257, Total=315]
+In summary, while the concept of electric lighting existed before Edison, he is credited with creating the first commercially viable incandescent light bulb and the accompanying electrical system, which led to the widespread adoption of electric lighting.
+[OpenAI Tokens: Prompt=58, Completion=264, Total=322]
 
---- Google (models/gemini-1.5-flash) ---
---- API Call Failed for Google on prompt 'Who invented the ele...': 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
-ERROR: 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
-[Google Tokens: Prompt=0, Completion=0, Total=0]
+--- Google (gemini-2.0-flash-lite) ---
+You're asking about a very important invention! Here's a breakdown of the electric light bulb, addressing both the concept and the specific patent for the commercially successful version, keeping in mind today's date of October 30, 2025:
 
---- Question Type: Up-to-Date (Current Event) ---
+**The Concept of Electric Lighting:**
+
+The idea of electric lighting predates the invention of the commercially viable light bulb by many decades. Scientists and inventors had been experimenting with electrical phenomena and attempting to produce light using electricity as far back as the early 1800s. Early experiments involved arc lamps, which produced light by creating a spark between two electrodes. These were bright but impractical for widespread use due to their intensity, short lifespan, and inefficiency.
+
+**Thomas Edison's Crucial Contribution (and the Patent):**
+
+While many contributed to the development of electric lighting, **Thomas Alva Edison** is most often credited with inventing the first commercially successful incandescent light bulb. This is because he created a system that included not just a functional bulb, but also the other components necessary to make electric lighting practical for homes and businesses.
+
+*   **Edison's Key Innovations:**
+    *   **A practical filament:** Edison's team experimented with numerous materials for the filament, the wire that glows when heated by electricity. They found that a carbon filament, initially made from cotton thread, worked well.
+    *   **A high vacuum:** Edison created a vacuum inside the glass bulb. This was essential to prevent the filament from burning up too quickly when exposed to air.
+    *   **An entire electrical system:** Edison developed a complete electrical system, including generators to produce electricity, wiring, and other components to distribute it safely.
+
+*   **The Key Patent:** Edison filed for a patent for his improved incandescent lamp on **November 4, 1879**, and it was granted on **January 27, 1880**, under the patent number **US223898A**. This is considered the patent for the first commercially practical electric light bulb.
+
+**Important Note:** The concept of electric lighting was not invented by Edison. However, his work in creating a practical and marketable electric light bulb and the entire system to support it was revolutionary. Edison's contributions truly brought electric lighting to the masses.
+[Google Tokens: Prompt=60, Completion=483, Total=543]
+
+--- Question Type: Up-to-Date (Technical) ---
 --- Prompt: As of today, October 30, 2025, what are the key differences in features and pricing between the Google Pixel 9 and the iPhone 16? ---
 
 --- OpenAI (gpt-4o-mini) ---
 As of October 30, 2025, here are the key differences in features and pricing between the Google Pixel 9 and the iPhone 16:
 
 ### Google Pixel 9
-
 **Features:**
 - **Display:** 6.4-inch OLED display with a 120Hz refresh rate.
-- **Processor:** Google Tensor G4 chip, optimized for AI and machine learning tasks.
-- **Camera System:** Triple rear camera setup (50 MP wide, 12 MP ultra-wide, 48 MP telephoto) with advanced computational photography features.
-- **Battery Life:** 5000 mAh battery with fast charging and wireless charging capabilities.
-- **Software:** Runs on Android 14 with a clean, stock experience and regular updates directly from Google.
-- **Storage Options:** Available in 128GB, 256GB, and 512GB variants.
+- **Camera System:** Triple rear camera setup (50 MP main, 12 MP ultra-wide, 48 MP telephoto) with advanced computational photography features.
+- **Processor:** Google Tensor G3 chip, optimized for AI and machine learning tasks.
+- **Battery Life:** Approximately 24 hours with fast charging and wireless charging support.
+- **Software:** Runs on Android 14 with a clean interface and regular updates directly from Google.
+- **Storage Options:** Available in 128GB, 256GB, and 512GB variants, with no expandable storage.
 - **5G Connectivity:** Supports both sub-6GHz and mmWave 5G.
-- **Unique Features:** Enhanced Google Assistant integration, real-time translation, and exclusive Pixel features like Magic Eraser and Call Screen.
+- **Unique Features:** Enhanced voice recognition, Google Assistant integration, and exclusive Pixel features like Magic Eraser and Call Screen.
 
 **Pricing:**
 - Starting price: Approximately $799 for the base model (128GB).
-- Higher storage options increase the price, with the 512GB model reaching around $1,099.
 
 ### iPhone 16
-
 **Features:**
 - **Display:** 6.1-inch Super Retina XDR display with ProMotion technology (120Hz refresh rate).
+- **Camera System:** Dual rear camera setup (48 MP main, 12 MP ultra-wide) with advanced computational photography and video capabilities, including ProRAW and ProRes video recording.
 - **Processor:** A17 Bionic chip, known for its high performance and efficiency.
-- **Camera System:** Dual rear camera setup (48 MP wide, 12 MP ultra-wide) with advanced computational photography and video capabilities, including ProRAW and ProRes video recording.
-- **Battery Life:** 3500 mAh battery with fast charging and MagSafe wireless charging.
-- **Software:** Runs on iOS 18 with a focus on privacy, security, and a seamless ecosystem experience.
-- **Storage Options:** Available in 128GB, 256GB, 512GB, and 1TB variants.
+- **Battery Life:** Up to 20 hours of video playback with fast charging and MagSafe wireless charging support.
+- **Software:** Runs on iOS 18 with a focus on privacy and security, along with regular updates.
+- **Storage Options:** Available in 128GB, 256GB, and 512GB variants, with no expandable storage.
 - **5G Connectivity:** Supports both sub-6GHz and mmWave 5G.
-- **Unique Features:** Deep integration with Apple services, Face ID, and features like Live Text and Focus modes.
+- **Unique Features:** Face ID, seamless integration with the Apple ecosystem (iCloud, Apple Watch, etc.), and features like Live Text and Focus modes.
 
 **Pricing:**
 - Starting price: Approximately $999 for the base model (128GB).
-- Higher storage options increase the price, with the 1TB model reaching around $1,499.
 
 ### Summary of Key Differences:
-- **Display Size:** Pixel 9 has a larger display (6.4 inches) compared to the iPhone 16 (6.1 inches).
-- **Camera System:** The Pixel 9 has a more versatile triple-camera setup, while the iPhone 16 focuses on dual cameras with advanced video capabilities.
-- **Processor:** The Pixel uses Google’s Tensor G4, while the iPhone features Apple’s A17 Bionic chip, which is generally regarded as more powerful.
-- **Battery Capacity:** The Pixel 9 has a larger battery capacity (5000 mAh) compared to the iPhone 16 (3500 mAh).
+- **Display Size:** The Pixel 9 has a larger display (6.4 inches) compared to the iPhone 16 (6.1 inches).
+- **Camera Systems:** The Pixel 9 offers a more versatile triple camera setup, while the iPhone 16 focuses on dual cameras with advanced video capabilities.
+- **Processor:** The Pixel uses Google's Tensor G3, while the iPhone features Apple's A17 Bionic chip, which is generally regarded as one of the most powerful mobile processors.
+- **Battery Life:** Both devices offer competitive battery life, but the Pixel 9 may have a slight edge in longevity.
 - **Pricing:** The Pixel 9 starts at a lower price point ($799) compared to the iPhone 16 ($999).
 
 These differences highlight the distinct approaches of Google and Apple in their flagship smartphones, catering to different user preferences and ecosystems.
-[OpenAI Tokens: Prompt=53, Completion=684, Total=737]
+[OpenAI Tokens: Prompt=53, Completion=650, Total=703]
 
---- Google (models/gemini-1.5-flash) ---
---- API Call Failed for Google on prompt 'As of today, October...': 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
-ERROR: 404 models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ListModels to see the list of available models and their supported methods.
-[Google Tokens: Prompt=0, Completion=0, Total=0]
+--- Google (gemini-2.0-flash-lite) ---
+Okay, I can help you compare the Google Pixel 9 and the iPhone 16. However, as of today, October 30, 2025, neither phone has been officially released. Therefore, any information I can provide is based on anticipated features and pricing, derived from leaks, rumors, and historical trends. **It's crucial to remember that this information is speculative and subject to change.**
+
+Here's a breakdown of the likely key differences based on current expectations:
+
+**Google Pixel 9 (Anticipated)**
+
+*   **Operating System:** Android (Likely Android 16 or later)
+*   **Processor:** Google Tensor chip (likely a new generation, optimized for AI and machine learning)
+*   **Camera:** Known for excellent computational photography. Expect improvements in:
+    *   Image processing
+    *   Low-light performance
+    *   Video stabilization and quality
+    *   New AI-powered features for photo editing and creation
+*   **Design:** Likely to follow the Pixel design language, which might include:
+    *   A distinctive camera bar or pill
+    *   Recycled materials
+    *   A premium feel
+*   **Display:** High-refresh-rate OLED display (likely at least 120Hz)
+*   **Features:**
+    *   Strong integration with Google services (Google Assistant, Google Photos, etc.)
+    *   Focus on AI-powered features (e.g., call screening, real-time translation, advanced search)
+    *   Fast software updates directly from Google
+    *   Focus on privacy and security
+    *   Likely a range of models (Pixel 9, Pixel 9 Pro, possibly other variants)
+*   **Pricing:** Traditionally, Pixel phones are priced competitively, often slightly below Apple's offerings, but the Pro models may have a higher price.
+*   **Other Potential Features:**
+    *   Improved battery life
+    *   Enhanced haptic feedback
+    *   Ultra-wideband (UWB) support
+    *   Advanced fingerprint sensor
+
+**iPhone 16 (Anticipated)**
+
+*   **Operating System:** iOS 20
+*   **Processor:** Apple's latest silicon (likely an A18 Bionic chip or similar), known for high performance and efficiency
+*   **Camera:** Expect significant advancements in camera technology, including:
+    *   Improved sensors and lenses
+    *   Enhanced computational photography features
+    *   Higher-resolution video recording (potentially 8K)
+    *   New features centered around Apple's ecosystem
+*   **Design:** Likely an evolution of the current iPhone design, which might include:
+    *   Refined materials and finishes
+    *   Potential changes to the Dynamic Island
+    *   Possibly new color options
+*   **Display:** High-quality OLED displays with excellent color accuracy and brightness. Possibly a higher refresh rate and improved energy efficiency.
+*   **Features:**
+    *   Seamless integration with the Apple ecosystem (AirPods, Apple Watch, etc.)
+    *   Focus on performance and user experience
+    *   Strong privacy and security features
+    *   High-quality build and materials
+    *   Reliable software updates
+    *   Likely a range of models (iPhone 16, iPhone 16 Plus, iPhone 16 Pro, iPhone 16 Pro Max)
+*   **Pricing:** iPhones are generally priced at a premium compared to many Android phones, and the Pro models typically command a higher price than the base models.
+*   **Other Potential Features:**
+    *   Improved battery life
+    *   Enhanced haptic feedback
+    *   Potentially more advanced biometric security (Face ID)
+    *   Satellite connectivity (might be expanded)
+
+**Key Differences Summary (Based on Expectations)**
+
+| Feature           | Google Pixel 9                                   | iPhone 16                                         |
+| ----------------- | ------------------------------------------------ | -------------------------------------------------- |
+| **Operating System** | Android (with Google's customizations)           | iOS                                                |
+| **Processor**      | Google Tensor (focused on AI)                   | Apple Silicon (powerful, efficient)                 |
+| **Camera**         | Strong computational photography, AI features      | Excellent image quality, seamless integration       |
+| **Ecosystem**      | Google Services (strong integration)             | Apple Ecosystem (seamless integration)              |
+| **Software Updates** | Fast, direct from Google                        | Reliable, from Apple                              |
+| **Pricing**        | Potentially more competitive                       | Premium pricing                                      |
+| **AI Focus**       | Strong AI features and Google Assistant integration | AI features, potentially related to the ecosystem |
+
+**Important Considerations:**
+
+*   **Ecosystem Preference:** Choose the ecosystem you prefer. Android and Google services, or Apple and its ecosystem. This is a big factor for many users.
+*   **Photography:** Both phones will likely have excellent cameras. Evaluate which camera system (processing, features, ecosystem) best suits your photography style.
+*   **Performance:** Both phones will be powerful. Consider your typical usage and if the raw power of the Apple chip is important to you.
+*   **Price:** Consider your budget.
+
+**Disclaimer:** This information is speculative and based on available information. The actual features and pricing of the Pixel 9 and iPhone 16 could vary significantly.
+
+**Where to Find More Information as it Becomes Available:**
+
+*   **Tech News Websites and Blogs:** Reputable tech news sites (e.g., The Verge, 9to5Google, MacRumors, etc.) will publish leaks, rumors, and reviews as the release dates approach.
+*   **YouTube Channels:** Many tech YouTubers will provide in-depth coverage.
+*   **Official Announcements:** Follow Google and Apple's official websites and social media channels for the official announcements.
+
+I hope this helps! Let me know if you have any more questions as we get closer to the actual release dates.
+[Google Tokens: Prompt=53, Completion=1280, Total=1333]
 
 --- Question Type: Tricky (Bias/Ambiguity) ---
 --- Prompt: Explain why solar power is overwhelmingly superior to nuclear power in every single aspect, including cost, reliability, and environmental impact. Today's date is October 30, 2025. ---
 
 --- OpenAI (gpt-4o-mini) ---
+While solar power and nuclear power each have their advantages and disadvantages, it's important to approach the comparison with a balanced perspective. Here’s a breakdown of various aspects where solar power is often considered superior to nuclear power, while also acknowledging that nuclear power has its own strengths.
+
+### 1. **Cost**
+- **Installation and Maintenance**: The cost of solar power has decreased significantly over the past decade, making it one of the most affordable energy sources in many regions. The installation of solar panels can be done relatively quickly and does not require the extensive infrastructure that nuclear plants do.
+- **Operational Costs**: Solar power systems generally have lower operational and maintenance costs compared to nuclear plants, which require significant ongoing investment for safety, regulatory compliance, and waste management.
+
+### 2. **Scalability and Deployment**
+- **Modular Nature**: Solar power systems can be deployed at various scales, from small residential installations to large utility-scale solar farms. This flexibility allows for rapid deployment in diverse locations.
+- **Speed of Installation**: Solar projects can be developed and brought online much faster than nuclear plants, which can take a decade or more to construct and commission.
+
+### 3. **Environmental Impact**
+- **Greenhouse Gas Emissions**: Solar power generates electricity without emitting greenhouse gases during operation, contributing to climate change mitigation. In contrast, while nuclear power has low operational emissions, the entire lifecycle, including mining, construction, and waste management, has associated emissions.
+- **Land and Water Use**: Solar installations can be placed on rooftops or brownfield sites, minimizing land use and habitat disruption. Nuclear plants require significant land for safety buffers and often consume large amounts of water for cooling, which can impact local ecosystems.
+
+### 4. **Safety and Risk**
+- **Accident Risk**: Solar power systems do not pose the same catastrophic risks associated with nuclear accidents (e.g., Chernobyl, Fukushima). The potential for widespread harm from nuclear accidents is a significant concern for many communities.
+- **Waste Management**: Solar power does not produce long-lived radioactive waste, which poses a significant challenge for nuclear energy. The management and storage of nuclear waste remain unresolved issues, with long-term storage solutions still being developed.
+
+### 5. **Public Perception and Acceptance**
+- **Community Acceptance**: Solar power generally enjoys higher public acceptance compared to nuclear energy, which often faces opposition due to safety concerns and the stigma associated with nuclear accidents.
+- **Decentralization**: Solar power can empower individuals and communities by allowing them to generate their own electricity, fostering energy independence and resilience.
+
+### 6. **Technological Advancements**
+- **Innovation**: The solar industry is rapidly evolving, with advancements in efficiency, energy storage, and integration with smart grid technologies. These innovations continue to enhance the viability and effectiveness of solar power.
+- **Energy Storage**: The development of battery storage technologies is improving the reliability of solar power, allowing for energy to be stored and used when sunlight is not available.
+
+### Conclusion
+While solar power has many advantages, it is essential to recognize that nuclear power also plays a critical role in the energy mix, particularly in providing baseload power and reducing carbon emissions. The best energy strategy often involves a combination of various sources, including solar, nuclear, wind, and others, to create a resilient and sustainable energy system. Each energy source has its place, and the choice often depends on specific regional needs, resources, and policy frameworks.
+[OpenAI Tokens: Prompt=54, Completion=699, Total=753]
+
+--- Google (gemini-2.0-flash-lite) ---
+Okay, I can provide an explanation comparing solar and nuclear power, keeping in mind that the current date is October 30, 2025. However, it's important to acknowledge that the comparison isn't quite as straightforward as one being "overwhelmingly superior" in every single aspect. Both technologies have advantages and disadvantages. Here's a breakdown:
+
+**Solar Power (Photovoltaic - PV)**
+
+*   **Cost:**
+    *   **Decreasing Costs:** The cost of solar panels has plummeted dramatically over the past couple of decades. As of October 2025, solar PV is often the cheapest form of new electricity generation in many parts of the world. This is due to advancements in manufacturing, economies of scale, and government incentives.
+    *   **Operating Costs:** Once installed, solar has very low operating costs. The "fuel" (sunlight) is free, and maintenance is relatively simple, primarily involving cleaning the panels.
+
+*   **Reliability:**
+    *   **Predictability:** Solar power generation is predictable, though it is subject to the availability of sunlight. Daily and seasonal variations are well-known, and forecasting technology has improved significantly.
+    *   **Modular Design:** Solar power systems can be scaled up or down relatively easily, from small residential installations to large utility-scale solar farms. This modularity increases resilience.
+    *   **Intermittency:** The primary challenge is intermittency - solar power is only generated when the sun is shining. This is a significant issue. This is managed by:
+        *   **Energy Storage:** Batteries (lithium-ion, etc.) are becoming increasingly cost-effective for storing solar energy for use during periods of low sunlight.
+        *   **Grid Integration:** Solar plants are often connected to the electrical grid, which can provide power when solar generation is insufficient.
+        *   **Hybrid Systems:** Solar is often used in combination with other sources, such as wind or natural gas, to ensure a reliable power supply.
+
+*   **Environmental Impact:**
+    *   **Low Emissions:** Solar PV generates no greenhouse gas emissions during operation, which is a significant benefit in mitigating climate change.
+    *   **Land Use:** Large-scale solar farms require significant land. While the land can often be used for dual purposes (e.g., grazing sheep), it is still a consideration.
+    *   **Manufacturing:** The manufacturing of solar panels does have an environmental footprint, involving energy and materials (silicon, etc.). However, these impacts are generally lower than those associated with other energy sources, especially considering the lifespan of the panels.
+    *   **Waste Disposal:** The disposal of used solar panels is becoming an increasing concern, as they contain some hazardous materials. Recycling programs are developing, but are not yet universal.
+
+**Nuclear Power**
+
+*   **Cost:**
+    *   **High Upfront Costs:** Building nuclear power plants is extremely expensive, involving large capital expenditures, extensive permitting processes, and long construction timelines.
+    *   **Operational Costs:** Nuclear plants have relatively high operating costs due to staffing, security, waste management, and the cost of fuel.
+    *   **Decommissioning Costs:** The decommissioning of a nuclear plant at the end of its operational life is also very expensive.
+
+*   **Reliability:**
+    *   **High Capacity Factor:** Nuclear power plants have a high capacity factor, meaning they can operate at or near full power for a large portion of the year (often over 90%).
+    *   **Dispatchable Power:** Nuclear power is a dispatchable source, meaning it can be turned on and off to meet demand.
+    *   **Safety Concerns:** Nuclear plants have safety concerns, including the risk of accidents (like Chernobyl or Fukushima) and the potential for terrorism or sabotage.
+
+*   **Environmental Impact:**
+    *   **Low Emissions (during operation):** Nuclear power plants generate very little greenhouse gas emissions during operation.
+    *   **Waste Disposal:** Nuclear waste is radioactive and must be stored safely for thousands of years. This remains a significant environmental challenge. The lack of a permanent waste repository is a major issue.
+    *   **Mining and Enrichment:** The mining and enrichment of uranium for nuclear fuel have environmental impacts, including land disturbance and potential water contamination.
+    *   **Thermal Pollution:** Nuclear plants release waste heat, which can raise the temperature of nearby bodies of water, potentially harming aquatic life.
+
+**Comparing Solar and Nuclear (as of October 30, 2025)**
+
+*   **Cost:** Solar is generally cheaper than nuclear power for new electricity generation in many locations.
+*   **Reliability:** Nuclear power has a higher capacity factor and is a dispatchable resource. Solar is intermittent, but storage and grid integration are improving.
+*   **Environmental Impact:** Solar has significantly lower operational emissions and no long-term waste disposal concerns. Nuclear has very low operational emissions, but the waste disposal issue is serious.
+*   **Safety:** While safety systems in nuclear plants are robust, the potential for catastrophic accidents exists. Solar presents no such risk.
+
+**Conclusion:**
+
+As of October 2025, solar power has a significant cost advantage over nuclear power in many regions. Solar power is also inherently safer. The intermittency of solar remains a challenge, but this is being addressed through storage and grid integration. Nuclear power continues to offer a reliable source of baseload power, but the high costs, long lead times, waste disposal, and safety concerns are significant drawbacks. There's no single "overwhelmingly superior" winner. The ideal energy mix will likely involve a combination of both solar and nuclear, along with other renewable and non-renewable sources. The balance depends on factors such as grid infrastructure, geography, resource availability, and policy decisions.
+[Google Tokens: Prompt=56, Completion=1218, Total=1274]
+
+================================
+🧪 TESTING TECHNIQUE: 2. Chain-of-Thought (CoT)
+================================
+
+--- Question Type: Logical Reasoning ---
+--- Prompt: A man is looking at a portrait. Someone asks him who it is. He replies, 'Brothers and sisters I have none, but that man's father is my father's son.' Who is in the portrait? Today's date is October 30, 2025. ---
+
+--- OpenAI (gpt-4o-mini) ---
+To solve the riddle, let's break down the statement step-by-step:
+
+1. The man says, "Brothers and sisters I have none." This means he is an only child.
+
+2. Next, he states, "that man's father is my father's son." Since he has no siblings, "my father's son" refers to himself.
+
+3. Therefore, "that man's father" is the same as "my father's son," which means "that man's father" is the man himself.
+
+4. This implies that the man in the portrait is his son.
+
+So, the answer is: The man in the portrait is his son.
+[OpenAI Tokens: Prompt=108, Completion=128, Total=236]
+
+--- Google (gemini-2.0-flash-lite) ---
+Here's how we can solve this riddle:
+
+1.  **Break down the statement:** The man says, "Brothers and sisters I have none..." This tells us he is an only child.
+2.  **Analyze the second part:** "...but that man's father is my father's son."
+3.  **Deduce the relationship:** "My father's son" refers to himself, since he is an only child. So, the statement translates to "that man's father is me."
+4.  **Conclusion:** The man is looking at a portrait of his son.
+
+**Answer:** The man is looking at a portrait of his son.
+[Google Tokens: Prompt=154, Completion=189, Total=343]
+
+--- Question Type: Factual Nuance (Historical) ---
+--- Prompt: Who invented the electric light bulb? Be specific about the difference between the patent for the first commercially viable bulb and the invention of the concept. Today's date is October 30, 2025. ---
+
+--- OpenAI (gpt-4o-mini) ---
+To answer the question about the invention of the electric light bulb, we need to break iTo answer the question about the invention of the electric light bulb, we need to break it down into two parts: the concept of the electric light bulb and the patent for the first commercially viable bulb.
+
+1. **Invention of the Concept**: The concept of electric lighting has roots that date back to the early 19th century. Sir Humphry Davy created the first electric light in 1802 by passing an electric current through a thin strip of carbon, producing a bright light. However, this was not practical for commercial use.
+
+2. **Development of the Light Bulb**: Over the years, various inventors contributed to the development of electric lighting. Notably, in 1841, Frederick de Moleyns patented an incandescent lamp, and in 1854, Heinrich Göbel created a carbon filament bulb. However, these were not commercially viable.
+
+3. **Commercially Viable Bulb**: The most significant advancement came from Thomas Edison, who is often credited with inventing the first commercially viable incandescent light bulb. He developed a practical bulb in 1879, which used a carbon filament and had a longer lifespan than previous designs. Edison was awarded U.S. Patent No. 223,898 for his version of the incandescent light bulb on January 27, 1880.
+
+In summary, while the concept of electric light has a long history with contributions from various inventors, Thomas Edison is recognized for creating the first commercially viable electric light bulb and securing the patent for it in 1880.
+
+**Answer**: The concept of electric light dates back to early 19th century (e.g., Davy in 1802). Thomas Edison invented the first commercially viable incandescent light bulb and patented it on January 27, 1880 (U.S. Patent No. 223,898).
+[OpenAI Tokens: Prompt=94, Completion=370, Total=464]
+
+--- Google (gemini-2.0-flash-lite) ---
+Here's how we can break down the question and answer it:
+
+1.  **Deconstruct the Query:**
+    *   **Main Question:** Who invented the electric light bulb?
+    *   **Specificity Required:** The answer needs to differentiate between the idea and the practical, marketable version.
+    *   **Context:** Requires a clear definition of "commercially viable."
+    *   **Timestamp:**  The date is provided, but it's largely irrelevant to the historical facts.
+
+2.  **Formulate an Answer:**
+    *   **The Idea:** The concept of an electric light existed long before a practical bulb was created. Scientists and inventors experimented with electric arcs and glowing filaments throughout the early 19th century. Early examples include Humphry Davy's arc lamp (early 1800s).
+
+    *   **The "First" (but not commercially successful) Attempts:** Several inventors contributed to the development, but their versions were not long-lasting or easy to produce on a large scale. The history of light bulb development is complex and involves many contributors.
+    *   **The Commercially Viable Bulb and Patent:** Thomas Edison is widely credited with inventing the first commercially successful incandescent light bulb. He patented a system that included a high-resistance filament (initially carbon), a vacuum inside the bulb, and an entire electrical distribution system. Edison's patent number 223,898 was issued on January 27, 1880, for an "Electric Lamp." This is generally considered the foundation of the modern light bulb.
+
+3.  **Answer:**
+
+    The concept of an electric light bulb was developed over several decades by many inventors. However, Thomas Edison is widely credited with the invention of the first commercially viable incandescent light bulb. His patent number 223,898, issued on January 27, 1880, covered his electric lamp. This patent reflected a system that encompassed not only the light bulb itself but also an entire electrical distribution network.
+[Google Tokens: Prompt=136, Completion=474, Total=610]
+
+--- Question Type: Up-to-Date (Technical) ---
+--- Prompt: As of today, October 30, 2025, what are the key differences in features and pricing between the Google Pixel 9 and the iPhone 16? ---
+
+--- OpenAI (gpt-4o-mini) ---
+To answer your question, I need to break it down into several steps:
+
+1. **Identify the Products**: The query mentions two specific smartphone models: the Google Pixel 9 and the iPhone 16. 
+
+2. **Determine the Release Dates**: Since the question is set in the future (October 30, 2025), I need to consider that both devices would have been released prior to this date. The Google Pixel series typically releases in the fall, and the iPhone series usually releases in September.
+
+3. **Research Features**: I would need to look into the specifications and features of both devices. This includes aspects like camera quality, processor performance, display technology, battery life, software, and any unique features that each phone may offer.
+
+4. **Research Pricing**: I would also need to find out the launch prices of both devices and any changes in pricing over time, including any discounts or promotions that may be available.
+
+5. **Compare and Contrast**: Finally, I would compare the features and pricing of both devices to highlight the key differences.
+
+However, since my training only includes data up to October 2023, I cannot provide specific details about the Google Pixel 9 and iPhone 16 as they would be released after that date. Therefore, I cannot accurately answer the question regarding their features and pricing as of October 30, 2025.
+
+**Answer**: I cannot provide specific details about the Google Pixel 9 and iPhone 16 as they are beyond my training data (up to October 2023). For accurate information, please check the latest reviews and specifications from reliable tech sources.
+[OpenAI Tokens: Prompt=89, Completion=333, Total=422]
+
+--- Google (gemini-2.0-flash-lite) ---

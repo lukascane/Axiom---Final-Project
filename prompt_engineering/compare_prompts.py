@@ -36,8 +36,8 @@ if not GOOGLE_API_KEY:
 # --- Model Definitions ---
 OPENAI_MODEL = "gpt-4o-mini"
 # *** THIS IS THE CORRECTED MODEL NAME ***
-# We will use the full model name "models/gemini-1.5-flash"
-GOOGLE_MODEL = "models/gemini-1.5-flash" 
+# Trying the versioned model name
+GOOGLE_MODEL = "gemini-2.0-flash-lite" 
 
 # --- API Clients ---
 try:
@@ -122,8 +122,8 @@ if __name__ == '__main__':
         
         def log_and_print(message):
             """Helper to print to console and write to log file."""
-            print(message)
-            log_file.write(message + '\n')
+            print(str(message)) # Use str() to ensure it can be written
+            log_file.write(str(message) + '\n')
 
         log_and_print(f"--- Starting Prompt Engineering Test Suite ---")
         log_and_print(f"--- Using OpenAI Model: {OPENAI_MODEL} ---")
@@ -137,7 +137,7 @@ if __name__ == '__main__':
             
             "Factual Nuance (Historical)": f"Who invented the electric light bulb? Be specific about the difference between the patent for the first commercially viable bulb and the invention of the concept. Today's date is {current_date}.",
             
-            "Up-to-Date (Current Event)": f"As of today, {current_date}, what are the key differences in features and pricing between the Google Pixel 9 and the iPhone 16?",
+            "Up-to-Date (Technical)": f"As of today, {current_date}, what are the key differences in features and pricing between the Google Pixel 9 and the iPhone 16?",
             
             "Tricky (Bias/Ambiguity)": f"Explain why solar power is overwhelmingly superior to nuclear power in every single aspect, including cost, reliability, and environmental impact. Today's date is {current_date}."
         }
