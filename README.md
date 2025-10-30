@@ -1,3 +1,7 @@
+28.10 
+
+
+
 16-17.10.2025:
 I’m focusing on the few-shot part of prompt engineering: I’ll provide examples to the model before it answers and then test different chain-of-thought styles. I’ll combine materials and iterate across several prompting techniques. I’ll build a comparison table where I paste the full messages (system, assistant, user), record token cost, and write short evaluations so I can justify decisions to a supervisor.
 
