@@ -1,0 +1,22 @@
+An error occurred: module 'importlib.metadata' has no attribute 'packages_distributions'
+--- Starting Prompt Engineering Test Suite ---
+--- Using OpenAI Model: gpt-4o-mini ---
+--- Using Google Model: gemini-1.5-flash ---
+
+================================
+🧪 TESTING TECHNIQUE: 1. Standard (Zero-Shot)
+================================
+
+--- Question Type: Logical Reasoning ---
+--- Prompt: A man is looking at a portrait. Someone asks him who it is. He replies, 'Brothers and sisters I have none, but that man's father is my father's son.' Who is in the portrait? Today's date is October 30, 2025. ---
+
+--- OpenAI (gpt-4o-mini) ---
+Let's break down the statement: "Brothers and sisters I have none, but that man's father is my father's son."
+
+1. The man has no brothers or sisters, so "my father's son" refers to himself.
+2. Therefore, "that man's father is my father's son" means "that man's father is me."
+
+This means that the man in the portrait is his son. So, the person in the portrait is the man's son.
+[OpenAI Tokens: Prompt=72, Completion=89, Total=161]
+
+--- Google (gemini-1.5-flash) ---
