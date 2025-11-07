@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 import httpx
 from datetime import datetime
 
-# --- YOUR EXISTING CODE (UNCHANGED) ---
+# ---  EXISTING CODE (UNCHANGED) ---
 
 load_dotenv()
 api_key = os.getenv("OPENAI_API_KEY")
