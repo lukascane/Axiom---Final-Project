@@ -1,4 +1,11 @@
-28.10 
+6 -7.11
+
+Today, I focused on the prompt engineering phase by creating a comprehensive Python testing script, compare_prompts.py. This script is designed to benchmark OpenAI's gpt-4o-mini against Google's gemini-1.5-flash using four distinct system prompts (Standard, Chain-of-Thought, Expert Persona, and Adversarial). The test suite includes questions targeting logical reasoning, historical nuance, up-to-date knowledge, and bias detection to evaluate response quality and efficiency. After resolving initial Python environment conflicts and API model name errors, the script is now fully functional. The next step is to run this script, collect the output in prompt_comparison_log.txt, and use that data to complete the analysis table for this project.
+
+
+
+
+\28.10 
 
 
 
