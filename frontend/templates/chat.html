@@ -5,215 +5,305 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Axiom Chat</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* A simple scrollbar for webkit browsers */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #888; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #555; }
+
+        /* Ensure HTML and Body take full height */
+        html, body {
+            height: 100%;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            overflow: hidden; /* Prevent body scroll */
+        }
+        
+        /* Loading spinner animation */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Message bubble styles */
+        .message-bubble {
+            max-width: 75%;
+            padding: 10px 15px;
+            border-radius: 18px;
+            word-wrap: break-word;
+            white-space: pre-wrap; /* Preserves newlines */
+            line-height: 1.5;
+        }
+        .user-message {
+            background-color: #007aff;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+        .assistant-message {
+            background-color: #e5e5ea;
+            color: black;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+    </style>
 </head>
 <body class="bg-gray-100">
-    <nav class="bg-white shadow-sm">
-        <div class="container mx-auto px-4">
-            <div class="flex justify-between items-center py-4">
-                <a href="/home" class="text-2xl font-bold text-gray-800">Axiom</a>
-                <div>
-                    <a href="/history" class="text-gray-600 hover:text-blue-500 mr-4">My History</a>
-                    <a href="/chat" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">New Chat</a>
-                </div>
+
+    <div class="flex h-screen w-screen">
+        
+        <!-- Left Panel: Chat History -->
+        <div class="w-1/4 bg-gray-50 border-r border-gray-200 flex flex-col h-full">
+            <div class="p-4 border-b border-gray-200 flex justify-between items-center">
+                <h2 class="text-xl font-semibold">My Chats</h2>
+                <button id="new-chat-btn" class="text-blue-500 hover:text-blue-700 text-2xl font-bold" title="New Chat">+</button>
+            </div>
+            <div id="chat-history-list" class="flex-1 overflow-y-auto p-2">
+                <!-- Chat history items will be loaded here -->
+                <p class="text-gray-500 p-4 text-center">No chats yet.</p>
             </div>
         </div>
-    </nav>
-    <div class="container mx-auto p-4 max-w-2xl">
-        <div class="bg-white rounded-lg shadow-md flex flex-col h-[80vh]">
+
+        <!-- Right Panel: Main Chat Interface -->
+        <div class="w-3/4 flex flex-col h-full">
+            
             <!-- Header -->
-            <div class="p-4 border-b flex justify-between items-center">
-                <h1 class="text-xl font-bold">Axiom AI Chat</h1>
-                <!-- I'm using a Jinja2 'if' statement to show the correct link based on context. -->
-                {% if is_owner %}
-                <a href="/history" class="text-sm text-blue-500 hover:underline">Back to History</a>
-                {% else %}
-                <a href="/home" class="text-sm text-blue-500 hover:underline">Back to Public Chats</a>
-                {% endif %}
+            <div class="bg-white border-b border-gray-200 p-4 flex items-center justify-center relative">
+                <h2 id="chat-title" class="text-xl font-semibold text-gray-700">Axiom Chat</h2>
             </div>
 
-            <!-- Message Display Area -->
-            <div id="chat-window" class="flex-1 p-4 overflow-y-auto space-y-4">
-                <!-- My JavaScript will dynamically load all messages here -->
+            <!-- Chat Messages -->
+            <div id="message-container" class="flex-1 overflow-y-auto p-6 space-y-4">
+                <!-- Messages will be injected here -->
+                <div class="flex justify-center items-center h-full">
+                    <p class="text-gray-500">Select a chat or start a new one.</p>
+                </div>
             </div>
 
-            <!-- Message Input Area -->
-            <div class="p-4 border-t">
-                <!-- I'm using another 'if' statement to only show the input box to the chat's owner. -->
-                {% if is_owner %}
-                <div id="input-area" class="flex items-center">
-                    <input type="text" id="message-input" placeholder="Type your message..." class="flex-1 border rounded-full py-2 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500" disabled>
-                    <button id="send-button" class="ml-4 bg-blue-500 text-white rounded-full p-2 hover:bg-blue-600 focus:outline-none cursor-not-allowed" disabled>
+            <!-- Input Area -->
+            <div class="bg-white border-t border-gray-200 p-4">
+                <form id="chat-form" class="flex items-center space-x-3">
+                    <input type="text" id="message-input" placeholder="Type your message..." class="flex-1 border border-gray-300 rounded-full py-3 px-5 focus:outline-none focus:ring-2 focus:ring-blue-500" disabled>
+                    <button type="submit" id="send-button" class="bg-blue-500 text-white rounded-full p-3 hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50" disabled>
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
                         </svg>
                     </button>
-                </div>
-                <div id="limit-message" class="text-center text-gray-500 text-sm mt-2 hidden">
-                    Conversation limit reached. <a href="/chat" class="text-blue-500">Start a new chat.</a>
-                </div>
-                {% else %}
-                <div class="text-center text-gray-500 text-sm">
-                    This is a public, read-only view of a conversation.
-                </div>
-                {% endif %}
+                </form>
             </div>
         </div>
     </div>
 
     <script>
-        // I'm using Jinja2's 'tojson' filter to safely pass variables from my Python backend to my JavaScript.
-        const THREAD_ID = {{ thread_id|tojson }};
-        const IS_OWNER = {{ is_owner|tojson }};
+        // --- STATE ---
+        // This will hold the ID of the currently active chat
+        let currentThreadId = null;
+        const API_URL = "http://127.0.0.1:5001"; // Your backend URL
+        
+        // --- THIS LINE WAS THE BUG AND HAS BEEN REMOVED ---
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const chatWindow = document.getElementById('chat-window');
-            const messageInput = document.getElementById('message-input');
-            const sendButton = document.getElementById('send-button');
-            const limitMessage = document.getElementById('limit-message');
-            const inputArea = document.getElementById('input-area');
+        // --- DOM ELEMENTS ---
+        const newChatBtn = document.getElementById('new-chat-btn');
+        const chatHistoryList = document.getElementById('chat-history-list');
+        const messageContainer = document.getElementById('message-container');
+        const chatForm = document.getElementById('chat-form');
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+        const chatTitle = document.getElementById('chat-title');
 
-            let threadId = THREAD_ID;
+        // --- EVENT LISTENERS ---
+        newChatBtn.addEventListener('click', handleNewChat);
+        chatForm.addEventListener('submit', handleSendMessage);
 
-            const addMessageToChat = (role, text) => {
-                const messageDiv = document.createElement('div');
-                const bubble = document.createElement('div');
-                bubble.innerText = text.replace(/\\n/g, '\n');
-                bubble.classList.add('p-3', 'rounded-lg', 'max-w-md', 'whitespace-pre-wrap');
+        // --- FUNCTIONS ---
 
-                if (role === 'user') {
-                    messageDiv.classList.add('flex', 'justify-end');
-                    bubble.classList.add('bg-blue-500', 'text-white');
-                } else {
-                    messageDiv.classList.add('flex', 'justify-start');
-                    bubble.classList.add('bg-gray-200', 'text-gray-800');
-                }
-                
-                messageDiv.appendChild(bubble);
-                chatWindow.appendChild(messageDiv);
-                chatWindow.scrollTop = chatWindow.scrollHeight;
-            };
-
-            const toggleLoadingState = (isLoading) => {
-                if (!IS_OWNER) return;
-                messageInput.disabled = isLoading;
-                sendButton.disabled = isLoading;
-                if (isLoading) {
-                    sendButton.classList.add('cursor-not-allowed', 'opacity-50');
-                    addMessageToChat('assistant', '...');
-                } else {
-                    sendButton.classList.remove('cursor-not-allowed', 'opacity-50');
-                    const allBubbles = chatWindow.querySelectorAll('.flex.justify-start div');
-                    const lastBubble = allBubbles[allBubbles.length - 1];
-                    if (lastBubble && lastBubble.innerText === '...') {
-                        lastBubble.parentElement.remove();
-                    }
-                }
-            };
-            
-            const handleConversationLimit = () => {
-                if (!IS_OWNER) return;
-                inputArea.classList.add('hidden');
-                limitMessage.classList.remove('hidden');
-            };
-
-            const startNewThread = async () => {
-                try {
-                    addMessageToChat('assistant', 'Starting a new conversation...');
-                    const response = await fetch('/api/chat/start', { method: 'POST' });
-                    // If I'm not logged in, the server will redirect, and I need to follow it.
-                     if (response.redirected) {
-                        window.location.href = response.url;
-                        return;
-                    }
-                    if (!response.ok) throw new Error('Could not start a new thread.');
-                    
-                    const data = await response.json();
-                    // After creating the new thread, I'll reload the page to the new URL.
-                    window.location.href = `/chat/${data.thread_id}`;
-                } catch (error) {
-                    console.error('Error starting thread:', error);
-                    addMessageToChat('assistant', 'Error: Could not start a new chat session. Please log in and try again.');
-                }
-            };
-
-            const loadHistory = async () => {
-                try {
-                    const response = await fetch(`/api/chat/${threadId}`);
-                    if (!response.ok) throw new Error('Could not load history.');
-                    const messages = await response.json();
-                    
-                    messages.forEach(msg => addMessageToChat(msg.role, msg.message));
-                    
-                    const userMessages = messages.filter(m => m.role === 'user').length;
-                    if (userMessages >= 5 && IS_OWNER) {
-                        handleConversationLimit();
-                    }
-
-                } catch (error) {
-                    console.error("Failed to load history", error);
-                    addMessageToChat('assistant', 'Could not load chat history.');
-                }
-            };
-
-            const sendMessage = async () => {
-                const messageText = messageInput.value.trim();
-                if (!messageText || !threadId) return;
-
-                addMessageToChat('user', messageText);
-                messageInput.value = '';
-                toggleLoadingState(true);
-
-                try {
-                    const response = await fetch(`/api/chat/${threadId}/message`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ message: messageText }),
-                    });
-
-                    toggleLoadingState(false);
-                    const data = await response.json();
-                    
-                    if (response.status === 403) { // Specifically handle conversation limit
-                        addMessageToChat('assistant', data.error);
-                        handleConversationLimit();
-                    } else if (!response.ok) {
-                        throw new Error(data.error || 'An unknown error occurred.');
-                    } else {
-                        addMessageToChat('assistant', data.message);
-                    }
-
-                } catch (error) {
-                    toggleLoadingState(false);
-                    console.error('Error sending message:', error);
-                    addMessageToChat('assistant', `Error: ${error.message}`);
-                }
-            };
-
-            // This is my main logic that decides what to do when the page loads.
-            if (threadId) {
-                // If I'm on a page for an existing chat, I'll load its history.
-                loadHistory();
-                if (IS_OWNER) {
-                    messageInput.disabled = false;
-                    sendButton.disabled = false;
-                    sendButton.classList.remove('cursor-not-allowed');
-                }
+        /**
+         * Disables or enables the chat input form
+         */
+        function setChatInputDisabled(disabled) {
+            messageInput.disabled = disabled;
+            sendButton.disabled = disabled;
+            if (disabled) {
+                messageInput.placeholder = "Please start a new chat first.";
             } else {
-                // If I'm on the generic /chat page, I'll start a new thread automatically.
-                startNewThread();
+                messageInput.placeholder = "Type your message...";
             }
+        }
+
+        /**
+         * Renders a single message to the chat container
+         */
+        function renderMessage(role, content) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message-bubble', role === 'user' ? 'user-message' : 'assistant-message');
+            messageDiv.textContent = content;
+            messageContainer.appendChild(messageDiv);
+        }
+
+        /**
+         * Renders a temporary loading spinner
+         */
+        function showLoadingSpinner() {
+            const spinnerId = 'loading-spinner';
+            if (document.getElementById(spinnerId)) return; // Don't add multiple
+
+            const spinnerDiv = document.createElement('div');
+            spinnerDiv.id = spinnerId;
+            spinnerDiv.classList.add('assistant-message', 'message-bubble');
             
-            if (IS_OWNER) {
-                sendButton.addEventListener('click', sendMessage);
-                messageInput.addEventListener('keydown', (event) => {
-                    if (event.key === 'Enter' && !messageInput.disabled) {
-                        sendMessage();
-                    }
-                });
+            const spinner = document.createElement('div');
+            spinner.classList.add('loading-spinner');
+            spinnerDiv.appendChild(spinner);
+            
+            messageContainer.appendChild(spinnerDiv);
+            scrollToBottom();
+        }
+
+        /**
+         * Removes the loading spinner
+         */
+        function removeLoadingSpinner() {
+            const spinner = document.getElementById('loading-spinner');
+            if (spinner) {
+                spinner.remove();
             }
-        });
+        }
+
+        /**
+         * Scrolls the message container to the bottom
+         */
+        function scrollToBottom() {
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+        }
+
+        /**
+         * Fetches all messages for a thread and renders them
+         */
+        async function fetchAndDisplayThread(threadId) {
+            currentThreadId = threadId;
+            messageContainer.innerHTML = ''; // Clear existing messages
+            chatTitle.textContent = `Chat ${threadId.substring(0, 8)}...`; // Simple title
+            setChatInputDisabled(false);
+
+            try {
+                const response = await fetch(`${API_URL}/api/chat/${threadId}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch messages.');
+                }
+                const messages = await response.json();
+                
+                messages.forEach(msg => {
+                    renderMessage(msg.role, msg.content);
+                });
+                
+                scrollToBottom();
+
+            } catch (error) {
+                console.error("Error fetching thread:", error);
+                renderMessage('assistant', `Error: ${error.message}`);
+            }
+            // We will also need to update the chat history list to show this one is 'active'
+            // (Functionality to be added in Step 3)
+        }
+
+        /**
+         * Fetches and displays the list of past chat threads
+         */
+        async function loadChatHistory() {
+            // This function is a placeholder for Step 2
+            // In a real app, this would fetch /api/history and render links
+            // For now, we'll just show a placeholder
+            chatHistoryList.innerHTML = '<p class="text-gray-500 p-4 text-center">Chat history will show here.</p>';
+        }
+
+        /**
+         * Handles the "+ New Chat" button click
+         */
+        async function handleNewChat() {
+            messageContainer.innerHTML = ''; // Clear the chat window
+            setChatInputDisabled(true); // Disable input while creating
+            chatTitle.textContent = "Starting new chat...";
+
+            try {
+                const response = await fetch(`${API_URL}/api/chat/start`, { method: 'POST' });
+                if (!response.ok) {
+                    throw new Error('Failed to start new chat.');
+                }
+                const data = await response.json();
+                
+                // Successfully created a new thread.
+                // Now fetch and display its (starter) messages.
+                await fetchAndDisplayThread(data.thread_id);
+
+            } catch (error) {
+                console.error("Error starting new chat:", error);
+                renderMessage('assistant', `Error: ${error.message}`);
+            }
+        }
+
+        /**
+         * Handles the send message form submission
+         */
+        async function handleSendMessage(e) {
+            e.preventDefault(); // Prevent form from reloading the page
+            
+            const messageText = messageInput.value.trim();
+            if (!messageText || !currentThreadId) {
+                return;
+            }
+
+            // 1. Optimistically render the user's message
+            renderMessage('user', messageText);
+            messageInput.value = ''; // Clear input
+            scrollToBottom();
+
+            // 2. Show a loading spinner
+            showLoadingSpinner();
+            
+            // 3. Send message to the backend
+            try {
+                const response = await fetch(`${API_URL}/api/chat/${currentThreadId}/message`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: messageText })
+                });
+
+                removeLoadingSpinner(); // Remove spinner regardless of outcome
+
+                if (!response.ok) {
+                    throw new Error('The server responded with an error.');
+                }
+
+                const aiResponse = await response.json();
+                
+                // 4. Render the AI's response
+                renderMessage(aiResponse.role, aiResponse.content);
+                scrollToBottom();
+
+            } catch (error) {
+                console.error("Error sending message:", error);
+                removeLoadingSpinner();
+                renderMessage('assistant', `Error: ${error.message}`);
+            }
+        }
+
+
+        // --- INITIALIZATION ---
+        function init() {
+            setChatInputDisabled(true); // Disable input on load
+            // loadChatHistory(); // This will be used in Step 3
+        }
+
+        init();
     </script>
 </body>
 </html>
-
-
