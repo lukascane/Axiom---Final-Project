@@ -6,55 +6,93 @@
     <title>Login - Axiom</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 flex items-center justify-center h-screen">
-    <div class="bg-white p-8 rounded-lg shadow-md w-full max-w-sm">
-        <h2 class="text-2xl font-bold mb-6 text-center">Login to Axiom</h2>
-        <form id="login-form">
-            <div class="mb-4">
-                <label for="email" class="block text-gray-700 text-sm font-bold mb-2">Email</label>
-                <input type="email" id="email" name="email" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+<body class="bg-gray-900 text-gray-200 font-sans antialiased flex items-center justify-center min-h-screen">
+
+    <div class="w-full max-w-md p-8 space-y-8 bg-gray-800 rounded-2xl shadow-lg">
+        <header class="text-center">
+            <h1 class="text-3xl font-extrabold text-white">
+                Login to Axiom
+            </h1>
+            <p class="mt-2 text-gray-400">Welcome back! Please enter your details.</p>
+        </header>
+
+        <!-- Login Form -->
+        <form id="login-form" class="space-y-6">
+            <div>
+                <label for="username" class="block text-sm font-medium text-gray-300">Username</label>
+                <input
+                    type="text"
+                    id="username"
+                    name="username"
+                    required
+                    class="w-full px-4 py-3 mt-1 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="testuser"
+                >
             </div>
-            <div class="mb-6">
-                <label for="password" class="block text-gray-700 text-sm font-bold mb-2">Password</label>
-                <input type="password" id="password" name="password" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500" required>
+
+            <div>
+                <label for="password" class="block text-sm font-medium text-gray-300">Password</label>
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    required
+                    class="w-full px-4 py-3 mt-1 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="password"
+                >
             </div>
-            <div class="flex items-center justify-between">
-                <button type="submit" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
-                    Sign In
-                </button>
-                <a href="/signup" class="inline-block align-baseline font-bold text-sm text-blue-500 hover:text-blue-800">
-                    Create Account
-                </a>
-            </div>
-             <p id="error-message" class="text-red-500 text-xs italic mt-4 text-center"></p>
+
+            <!-- Error Message Area -->
+            <div id="error-message" class="text-red-400 text-sm hidden"></div>
+
+            <button
+                type="submit"
+                id="login-button"
+                class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
+            >
+                Login
+            </button>
         </form>
+        
+        <footer class="text-center text-sm text-gray-400">
+            <p>Don't have an account? 
+                <a href="/signup" class="font-medium text-blue-400 hover:text-blue-500">Sign up</a>
+            </p>
+        </footer>
     </div>
 
     <script>
-        document.getElementById('login-form').addEventListener('submit', async (event) => {
-            event.preventDefault();
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const errorMessage = document.getElementById('error-message');
-            errorMessage.textContent = '';
+        const form = document.getElementById('login-form');
+        const errorEl = document.getElementById('error-message');
+        const button = document.getElementById('login-button');
 
-            try {
-                const response = await fetch('/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password }),
-                });
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            errorEl.classList.add('hidden');
+            button.disabled = true;
+            button.textContent = 'Logging in...';
 
-                if (response.ok) {
-                    window.location.href = '/chat';
-                } else {
-                    const data = await response.json();
-                    errorMessage.textContent = data.error || 'Login failed. Please try again.';
-                }
-            } catch (error) {
-                errorMessage.textContent = 'An error occurred. Please check your connection.';
+            const formData = new FormData(form);
+            
+            // NOTE: Your backend /login route uses Flask-Login, which expects
+            // form-urlencoded data, not JSON. So we send it that way.
+            const response = await fetch('/login', {
+                method: 'POST',
+                body: new URLSearchParams(formData)
+            });
+
+            if (response.ok) {
+                // Successful login, the server will redirect us
+                window.location.href = '/chat'; // Or wherever /index redirects
+            } else {
+                // Show an error
+                errorEl.textContent = 'Invalid username or password.';
+                errorEl.classList.remove('hidden');
+                button.disabled = false;
+                button.textContent = 'Login';
             }
         });
     </script>
+
 </body>
 </html>
