@@ -1,3 +1,79 @@
+Project Log: November 14, 2025
+
+Goal: Complete "Step 1 - Test the Backend API"
+
+My objective for today was to fully test and verify all backend chat API endpoints before moving on to building the UI. This involved starting the server, testing all routes with cURL, and debugging any errors that came up.
+
+1. Initial Environment & Dependency Debugging
+
+I started by running the flask command but immediately ran into zsh: command not found: flask.
+
+Diagnosis: My virtual environment (.venv) was not active.
+
+Fix: I activated it using source .venv/bin/activate.
+
+Problem: The command still failed. I discovered my pip install was defaulting to a global user installation, not installing packages inside the .venv.
+
+Solution: I rebuilt the virtual environment from scratch (rm -rf .venv, python3 -m venv .venv, source .venv/bin/activate) and ran pip install -r requirements.txt. This correctly installed all packages inside the active environment.
+
+2. Resolving Code & Dependency Conflicts
+
+With the environment fixed, running flask create-db revealed a series of crashes and bugs.
+
+Error 1: ModuleNotFoundError: No module named 'flask_bcrypt'
+
+Diagnosis: My app.py and models.py files required Flask-Bcrypt, but it was missing from requirements.txt.
+
+Fix: Added Flask-Bcrypt to requirements.txt and re-ran pip install -r requirements.txt.
+
+Error 2: TypeError: __init__() got an unexpected keyword argument 'proxies'
+
+Diagnosis: This was a deep dependency conflict. My requirements.txt was pinning openai to an old version (1.3.7), which was incompatible with its sub-dependencies.
+
+Fix: I updated requirements.txt to use the latest openai version and updated ai_service.py to use the modern client = OpenAI() and client.chat.completions.create() syntax.
+
+Error 3: RuntimeError: The current Flask app is not registered with this 'SQLAlchemy' instance.
+
+Diagnosis: I had accidentally created two SQLAlchemy instances. app.py was creating one (db = SQLAlchemy(app)), and models.py was creating another (db = SQLAlchemy()).
+
+Fix: I refactored app.py to import the db instance from models.py and initialize it correctly using db.init_app(app).
+
+Error 4: ImportError: cannot import name 'bcrypt' from 'models'
+
+Diagnosis: app.py was now correctly importing bcrypt from models.py, but my models.py file didn't actually define it.
+
+Fix: I updated models.py to include the from flask_bcrypt import Bcrypt and bcrypt = Bcrypt() initializations.
+
+Error 5: Multiple Model Mismatches
+
+Diagnosis: My app.py logic was out of sync with my models.py definitions.
+
+app.py used username, but models.py had email.
+
+app.py used uuid for thread IDs, but models.py used Integer.
+
+app.py used content for messages, but models.py had message.
+
+Fix: I performed a major update on models.py to be the single source of truth, aligning all table and column names (username, String(36) for id, content, etc.) and adding the set_password and check_password methods.
+
+3. Final API Verification (Step 1 Complete)
+
+After fixing all the code, I was able to successfully:
+
+Run flask create-db: This created the database and my testuser with id=1.
+
+Run python app.py: The server started without errors.
+
+Test POST /api/chat/start: This cURL test succeeded and returned a new thread_id.
+
+Test POST /api/chat/.../message: This failed with an error from OpenAI: Project ... does not have access to model gpt-3.5-turbo.
+
+Final Fix: I edited ai_service.py to use the gpt-4o-mini model, which my API key has access to.
+
+Final Test: I re-ran the cURL commands for start, message, and get. All three commands succeeded, and the API returned a real, conversational response from the AI.
+
+Status: Step 1 is complete. The backend API is stable, tested, and verified.
+
 6 -7.11
 
 Today, I focused on the prompt engineering phase by creating a comprehensive Python testing script, compare_prompts.py. This script is designed to benchmark OpenAI's gpt-4o-mini against Google's gemini-1.5-flash using four distinct system prompts (Standard, Chain-of-Thought, Expert Persona, and Adversarial). The test suite includes questions targeting logical reasoning, historical nuance, up-to-date knowledge, and bias detection to evaluate response quality and efficiency. After resolving initial Python environment conflicts and API model name errors, the script is now fully functional. The next step is to run this script, collect the output in prompt_comparison_log.txt, and use that data to complete the analysis table for this project.

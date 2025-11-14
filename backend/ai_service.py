@@ -1,33 +1,43 @@
-from dotenv import load_dotenv
 import os
-from openai import OpenAI
+from openai import OpenAI  # <-- Import the new client
+from dotenv import load_dotenv
 
-# Load the API key from the .env file
+# Load environment variables
 load_dotenv()
-api_key = os.getenv("OPENAI_API_KEY")
 
-if not api_key:
-    raise ValueError("ERROR: OpenAI API key not found. Check your .env file in /backend.")
+# --- 1. Initialize the new OpenAI client ---
+# This is the new, correct way to set the API key
+client = OpenAI(
+    api_key=os.getenv('OPENAI_API_KEY')
+)
 
-# Initialize OpenAI client
-client = OpenAI(api_key=api_key)
+if not os.getenv('OPENAI_API_KEY'):
+    print("Warning: OPENAI_API_KEY is not set.")
 
-def get_ai_response(message_history):
+def get_ai_response(messages_history):
     """
-    Takes a list of Message objects, formats them, and gets a response from the AI.
+    Takes a list of ChatMessage objects and returns a string response from the AI.
     """
-    # The AI model expects messages in a specific dictionary format.
-    formatted_messages = [
-        {"role": msg.role, "content": msg.content} for msg in message_history
+    
+    # 1. Format messages for the OpenAI API
+    openai_messages = [
+        {"role": "system", "content": "You are a helpful assistant."}
     ]
+    for msg in messages_history:
+        openai_messages.append({"role": msg.role, "content": msg.content})
 
+    # 2. Call OpenAI using the new client syntax
     try:
+        # --- This is the new, correct syntax ---
         completion = client.chat.completions.create(
-            model="gpt-4o-mini",  # or gpt-4o if you prefer
-            messages=formatted_messages
+            model="gpt-4o-mini",  # <-- CHANGED FROM gpt-3.5-turbo
+            messages=openai_messages
         )
-        return completion.choices[0].message.content
-
+        ai_response_content = completion.choices[0].message.content
+        # --- End of new syntax ---
+        
+        return ai_response_content
+        
     except Exception as e:
-        print(f"An error occurred with OpenAI API: {e}")
-        return "Sorry, I encountered an error and can't respond right now."
+        print(f"Error calling OpenAI: {e}")
+        return "Sorry, I encountered an error while processing your request."
