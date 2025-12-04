@@ -12,20 +12,15 @@ from flask_bcrypt import Bcrypt
 load_dotenv()
 
 # Tell Flask where to find the 'templates' folder.
-# '../frontend/templates' means "go up one directory from 'backend', then into 'frontend/templates'"
 app = Flask(__name__, template_folder='../frontend/templates')
 app.config['SECRET_KEY'] = 'a_very_secret_key_that_should_be_changed'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///db.sqlite3'
 
 # --- 2. IMPORT MODELS & SERVICES ---
-# Import models and services *before* initializing extensions
-# This brings in the uninitialized 'db' and 'bcrypt' from models.py
 from models import db, bcrypt, User, ChatThread, ChatMessage
 from ai_service import get_ai_response
 
 # --- 3. INITIALIZE EXTENSIONS ---
-# Now, initialize the imported instances with our app
-# This is the correct pattern to avoid circular imports and errors.
 db.init_app(app)
 bcrypt.init_app(app)
 
@@ -35,7 +30,6 @@ login_manager.login_view = 'login'
 # Flask-Login user loader
 @login_manager.user_loader
 def load_user(user_id):
-    # Use the new, recommended db.session.get()
     return db.session.get(User, int(user_id))
 
 # --- 4. HELPER COMMAND TO CREATE DB ---
@@ -43,7 +37,6 @@ def load_user(user_id):
 @app.cli.command('create-db')
 def create_db():
     """Creates the database and a default test user."""
-    # We need to be in an app context to run DB operations
     with app.app_context():
         db.create_all()
     
@@ -58,31 +51,19 @@ def create_db():
             print("User 'testuser' already exists.")
         print("Database created!")
 
-# --- 5. CORE CHAT API ENDPOINTS ---
+# --- 5. CORE CHAT API ENDPOINTS (FINAL SECURE VERSION) ---
 
 @app.route('/api/chat/start', methods=['POST'])
-# @login_required # <-- DISABLED FOR STEP 1 TESTING
+@login_required # <-- RE-ENABLED SECURITY
 def start_chat():
-    """ Starts a new chat thread. """
+    """ Starts a new chat thread for the logged-in user. """
     
-    # --- TEMPORARY FIX FOR STEP 1 ---
-    # We hardcode the user to '1' since we disabled login
-    user_id = 1 
-    # --- END TEMPORARY FIX ---
-
-    # Use the new, recommended db.session.get()
-    user = db.session.get(User, user_id)
-    if not user:
-        return jsonify({"error": "Test user with id=1 not found. Run 'flask create-db' first."}), 404
-
+    user = current_user
+    
     try:
-        # Create a new thread with a UUID
-        print(user_id)
         new_thread = ChatThread(user_id=user.id)
         db.session.add(new_thread)
-        print(new_thread)
         
-        # Add the initial welcome message from the assistant
         starter_message = ChatMessage(
             thread_id=new_thread.id,
             role="assistant",
@@ -91,12 +72,12 @@ def start_chat():
         db.session.add(starter_message)
         db.session.commit()
         
-        print(f"New chat thread created: {new_thread.id}")
+        print(f"New chat thread created: {new_thread.id} for user {user.id}")
         return jsonify({
             "thread_id": new_thread.id,
             "message": "New chat thread created.",
             "created_at": new_thread.created_at.isoformat(),
-            "first_message": "New Chat" # Default title
+            "first_message": "New Chat"
         })
 
     except Exception as e:
@@ -105,7 +86,7 @@ def start_chat():
         return jsonify({"error": str(e)}), 500
 
 @app.route('/api/chat/<string:thread_id>/message', methods=['POST'])
-# @login_required # <-- DISABLED FOR STEP 1 TESTING
+@login_required # <-- RE-ENABLED SECURITY
 def post_message(thread_id):
     """ Posts a new user message to a thread and gets an AI response. """
     
@@ -115,11 +96,14 @@ def post_message(thread_id):
     if not user_message_content:
         return jsonify({"error": "No message content provided"}), 400
 
-    # Use the new, recommended db.session.get()
     thread = db.session.get(ChatThread, thread_id)
     if not thread:
         return jsonify({"error": "Thread not found"}), 404
         
+    # --- SECURITY CHECK: Ensure user owns the thread ---
+    if thread.user_id != current_user.id:
+        return jsonify({"error": "Authorization required to post to this thread."}), 403
+
     try:
         # 1. Add User's message to DB
         user_message = ChatMessage(
@@ -128,7 +112,7 @@ def post_message(thread_id):
             content=user_message_content
         )
         db.session.add(user_message)
-        db.session.commit() # Commit the user's message first
+        db.session.commit()
 
         # 2. Prepare context for AI (fetch all messages for this thread)
         messages_history = thread.messages
@@ -143,7 +127,7 @@ def post_message(thread_id):
             content=ai_response_content
         )
         db.session.add(ai_message)
-        db.session.commit() # Commit the AI's message
+        db.session.commit()
 
         # 5. Return AI's response to the frontend
         return jsonify({"role": "assistant", "content": ai_response_content})
@@ -154,16 +138,21 @@ def post_message(thread_id):
         return jsonify({"error": str(e)}), 500
 
 @app.route('/api/chat/<string:thread_id>', methods=['GET'])
-# @login_required # <-- DISABLED FOR STEP 1 TESTING
+@login_required # <-- RE-ENABLED SECURITY
 def get_chat_messages(thread_id):
     """ Gets all messages for a specific chat thread. """
     
-    # Use the new, recommended db.session.get()
     thread = db.session.get(ChatThread, thread_id)
     if not thread:
         return jsonify({"error": "Thread not found"}), 404
 
-    messages = thread.messages # Already ordered by created_at (see models.py)
+    # --- SECURITY CHECK: Ensure user owns the thread ---
+    if thread.user_id != current_user.id:
+        # Allow viewing if it's public (only public threads can be viewed by others)
+        if not thread.is_public:
+            return jsonify({"error": "Authorization required to view this thread."}), 403
+        
+    messages = thread.messages 
     
     messages_data = [
         {
@@ -175,22 +164,19 @@ def get_chat_messages(thread_id):
     
     return jsonify(messages_data)
 
-# --- 6. CHAT HISTORY & MANAGEMENT API (From Graph) ---
+# --- 6. CHAT HISTORY & MANAGEMENT API (FINAL SECURE VERSION) ---
 
 @app.route('/api/history', methods=['GET'])
-# @login_required # <-- DISABLED FOR STEP 1 TESTING
+@login_required # <-- RE-ENABLED SECURITY
 def get_user_history():
-    """ Gets all chat threads for the hardcoded test user. """
+    """ Gets all chat threads for the currently logged-in user. """
     
-    # --- TEMPORARY FIX FOR STEP 1 ---
-    user_id = 1
-    # --- END TEMPORARY FIX ---
+    user_id = current_user.id
     
     threads = ChatThread.query.filter_by(user_id=user_id).order_by(ChatThread.created_at.desc()).all()
     
     history_data = []
     for t in threads:
-        # Find the first user message to use as a title
         first_user_message = next((msg for msg in t.messages if msg.role == 'user'), None)
         title = first_user_message.content[:30] + "..." if first_user_message else "New Chat"
         
@@ -203,23 +189,20 @@ def get_user_history():
     return jsonify(history_data)
 
 @app.route('/api/thread/<string:thread_id>/delete', methods=['DELETE'])
-# @login_required # <-- DISABLED FOR STEP 1 TESTING
+@login_required # <-- RE-ENABLED SECURITY
 def delete_thread(thread_id):
     """ Deletes a chat thread. """
-    # --- TEMPORARY FIX ---
-    user_id = 1
-    # --- END TEMPORARY FIX ---
     
     thread = db.session.get(ChatThread, thread_id)
     if not thread:
         return jsonify({"error": "Thread not found"}), 404
         
-    # TODO: When auth is on, check: if thread.user_id != current_user.id:
-    if thread.user_id != user_id:
-        return jsonify({"error": "Not authorized"}), 403
+    # --- SECURITY CHECK: Ensure user owns the thread ---
+    if thread.user_id != current_user.id:
+        return jsonify({"error": "Not authorized to delete this thread."}), 403
 
     try:
-        db.session.delete(thread) # This deletes all its messages due to cascade
+        db.session.delete(thread)
         db.session.commit()
         return jsonify({"message": "Thread deleted"}), 200
     except Exception as e:
@@ -227,19 +210,17 @@ def delete_thread(thread_id):
         return jsonify({"error": str(e)}), 500
 
 @app.route('/api/thread/<string:thread_id>/toggle_public', methods=['POST'])
-# @login_required # <-- DISABLED FOR STEP 1 TESTING
+@login_required # <-- RE-ENABLED SECURITY
 def toggle_public(thread_id):
     """ Toggles the public/private status of a thread. """
-    # --- TEMPORARY FIX ---
-    user_id = 1
-    # --- END TEMPORARY FIX ---
 
     thread = db.session.get(ChatThread, thread_id)
     if not thread:
         return jsonify({"error": "Thread not found"}), 404
     
-    if thread.user_id != user_id:
-        return jsonify({"error": "Not authorized"}), 403
+    # --- SECURITY CHECK: Ensure user owns the thread ---
+    if thread.user_id != current_user.id:
+        return jsonify({"error": "Not authorized to modify this thread."}), 403
 
     try:
         thread.is_public = not thread.is_public # Flip the boolean
@@ -252,6 +233,7 @@ def toggle_public(thread_id):
 @app.route('/api/public_threads', methods=['GET'])
 def get_public_threads():
     """ Gets all threads that are marked as public. """
+    # This remains unsecured so logged-out users can view the public feed.
     threads = ChatThread.query.filter_by(is_public=True).order_by(ChatThread.created_at.desc()).all()
     
     public_data = []
@@ -268,17 +250,16 @@ def get_public_threads():
     return jsonify(public_data)
 
 
-# --- 7. AUTH & PAGE ROUTES (FOR STEP 3 & 4) ---
+# --- 7. AUTH & PAGE ROUTES ---
 
 @app.route('/')
 @login_required 
 def index():
     """ The main authenticated landing page. """
-    # For now, just redirect to the main chat UI
     return redirect(url_for('chat_ui'))
 
 @app.route('/chat')
-# @login_required # <-- DISABLED FOR STEP 1 TESTING
+@login_required # <-- RE-ENABLED SECURITY
 def chat_ui():
     """ Renders the main chat application UI. """
     return render_template('chat.html')
@@ -303,9 +284,10 @@ def login():
             login_user(user)
             return redirect(url_for('index'))
         else:
-            flash('Invalid username or password', 'danger')
+            # Returns 401 Unauthorized for JS to handle in the front-end form logic
+            return jsonify({"error": "Invalid username or password"}), 401
             
-    return 'This is the login page. (POST /login with username & password)'
+    return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -315,11 +297,13 @@ def register():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
+
+        if not username or not password:
+            return jsonify({"error": "Username and password are required."}), 400
         
         existing_user = User.query.filter_by(username=username).first()
         if existing_user:
-            flash('Username already exists.', 'danger')
-            return redirect(url_for('register'))
+            return jsonify({"error": "Username already exists."}), 409 # 409 Conflict
             
         new_user = User(username=username)
         new_user.set_password(password)
@@ -327,10 +311,10 @@ def register():
         db.session.add(new_user)
         db.session.commit()
         
-        flash('Registration successful! Please log in.', 'success')
-        return redirect(url_for('login'))
+        return jsonify({"message": "Account created! Redirecting to login..."}), 201 # 201 Created
         
-    return 'This is the register page. (POST /register with username & password)'
+    return render_template('signup.html')
+
 
 @app.route('/logout')
 @login_required
@@ -341,6 +325,4 @@ def logout():
 # --- 8. APP RUNNER ---
 
 if __name__ == '__main__':
-    # We do *not* run db.create_all() here.
-    # We will use our 'flask create-db' command for that.
     app.run(debug=True, port=5001)
