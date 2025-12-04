@@ -77,8 +77,10 @@ def start_chat():
 
     try:
         # Create a new thread with a UUID
+        print(user_id)
         new_thread = ChatThread(user_id=user.id)
         db.session.add(new_thread)
+        print(new_thread)
         
         # Add the initial welcome message from the assistant
         starter_message = ChatMessage(
