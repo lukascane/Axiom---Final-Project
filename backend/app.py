@@ -61,17 +61,18 @@ def start_chat():
     user = current_user
     
     try:
-        new_thread = ChatThread(user_id=user.id)
+        new_thread = ChatThread(user_id=user.id) # issue for thread 
         db.session.add(new_thread)
-        
+        print(new_thread.id)
         starter_message = ChatMessage(
             thread_id=new_thread.id,
             role="assistant",
             content="Hello! How can I help you today?"
         )
+        
         db.session.add(starter_message)
         db.session.commit()
-        
+        print("test2")
         print(f"New chat thread created: {new_thread.id} for user {user.id}")
         return jsonify({
             "thread_id": new_thread.id,
@@ -260,6 +261,7 @@ def index():
 
 @app.route('/chat')
 @login_required # <-- RE-ENABLED SECURITY
+
 def chat_ui():
     """ Renders the main chat application UI. """
     return render_template('chat.html')
@@ -278,6 +280,8 @@ def login():
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
+        print(username)
+        print(password)
         user = User.query.filter_by(username=username).first()
 
         if user and user.check_password(password):
